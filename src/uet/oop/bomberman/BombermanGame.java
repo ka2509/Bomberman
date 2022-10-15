@@ -17,6 +17,7 @@ import uet.oop.bomberman.entities.*;
 import uet.oop.bomberman.graphics.Sprite;
 import uet.oop.bomberman.graphics.SpriteSheet;
 
+
 public class BombermanGame extends Application {
 
     public static final int WIDTH = 21;
