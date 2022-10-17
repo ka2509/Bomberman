@@ -1,5 +1,7 @@
 package uet.oop.bomberman.entities;
 import javafx.application.Platform;
+import uet.oop.bomberman.enemies.Balloom;
+import uet.oop.bomberman.enemies.Enemy;
 import uet.oop.bomberman.graphics.Sprite;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -24,7 +26,8 @@ public class Bomber extends Entity {
    public boolean goRight;
    public boolean goLeft;
    private boolean  isAlive;
-   private boolean hasPower;
+   private boolean hasFlame;
+   private boolean hasBombs;
    private int animated =0;
    private int die_animated = 0;
     private boolean hasActiveBomb;
@@ -34,10 +37,11 @@ public class Bomber extends Entity {
     private List<Entity> bricks= new ArrayList<>();
     private List<Entity> explodes = new ArrayList<>();
     private List<Entity> buffs = new ArrayList<>();
+    private List<Enemy> ballooms = new ArrayList<>();
     public Bomber(int x, int y, Image img, List<Entity> entities,
                   List<Entity> walls, List<Entity> bombs,
                   List<Entity> explodes, List<Entity> bricks,
-                  List<Entity> buffs) {
+                  List<Entity> buffs, List<Enemy> ballooms) {
         super( x, y, img);
         this.entities = entities;
         this.walls = walls;
@@ -45,9 +49,11 @@ public class Bomber extends Entity {
         this.explodes = explodes;
         this.bricks = bricks;
         this.buffs = buffs;
+        this.ballooms = ballooms;
         hasActiveBomb = false;
         isAlive = true;
-        hasPower = false;
+        hasFlame = true;
+        hasBombs = true;
     } 
    public void standUp() {
       img = Sprite.player_up.getFxImage();
@@ -62,34 +68,35 @@ public class Bomber extends Entity {
       img = Sprite.player_down.getFxImage();
    }
    public void placeBomb() {
-       if (hasActiveBomb) {
-           return;
-       }
-       Entity bomb = new Bomb(hasPower ? 2 : 1,entities, walls, bombs, explodes, bricks);
-
-       bomb.x = Sprite.SCALED_SIZE * (x / Sprite.SCALED_SIZE);
-       bomb.y = Sprite.SCALED_SIZE * (y / Sprite.SCALED_SIZE);
-       new Thread(() -> {
-           try {
-               hasActiveBomb = true;
-               Platform.runLater(() -> {
-                   ((Bomb) bomb).setBomb(bomb);
-               });
-               Thread.sleep(1500);
-               Platform.runLater(() -> {
-                   ((Bomb) bomb).explode();
-               });
-               Thread.sleep(300);
-               Platform.runLater(() -> {
-                   ((Bomb)bomb).clear();
-               });
-               Thread.sleep(100);
-               hasActiveBomb = false;
-           } catch (InterruptedException e) {
-               e.printStackTrace();
+           Entity bomb = new Bomb(hasFlame ? 2 : 1, entities, walls, bombs, explodes, bricks, ballooms);
+           if (!hasBombs && hasActiveBomb) {
+               return;
            }
-       }).start();
-
+           else if (hasBombs && bombs.size() ==2) {
+               return;
+           }
+           bomb.x = Sprite.SCALED_SIZE * (x / Sprite.SCALED_SIZE);
+           bomb.y = Sprite.SCALED_SIZE * (y / Sprite.SCALED_SIZE);
+           new Thread(() -> {
+               try {
+                   hasActiveBomb = true;
+                   Platform.runLater(() -> {
+                       ((Bomb) bomb).setBomb(bomb);
+                   });
+                   Thread.sleep(1500);
+                   Platform.runLater(() -> {
+                       ((Bomb) bomb).explode();
+                   });
+                   Thread.sleep(300);
+                   Platform.runLater(() -> {
+                       ((Bomb) bomb).clear();
+                   });
+                   Thread.sleep(100);
+                   hasActiveBomb = false;
+               } catch (InterruptedException e) {
+                   e.printStackTrace();
+               }
+           }).start();
    }
    void setKilled() {
         isAlive = false;
@@ -97,26 +104,16 @@ public class Bomber extends Entity {
    public boolean isAlive() {
         return isAlive;
    }
-//   public void checkBuff() {
-//        for(Entity p : buffs) {
-//            if(p.getX() == 0 && p.getY() == 0) {
-//                return;
-//            }
-//            else if(this.x - 10 <= p.getX() + 10 && this.x +10 >= p.getX() -10) {
-//                if(this.y +16 >= p.getY() - 10 && this.y -16 <= p.getY() +10) {
-//                    hasPower = true;
-//                    ((Buff) p).hide();
-//                }
-//            }
-//        }
-//   }
 public void checkBuff() {
     List<Entity> buffed = new ArrayList<>();
-        for(Entity p : buffs) {
-         if(this.x - 10 <= p.getX() + 10 && this.x +10 >= p.getX() -10) {
+        for(int i = 0; i < buffs.size(); i++) {
+         Entity p = buffs.get(i);
+            if(this.x - 10 <= p.getX() + 10 && this.x +10 >= p.getX() -10) {
             if(this.y +16 >= p.getY() - 10 && this.y -16 <= p.getY() +10) {
-                hasPower = true;
-                buffed.add(p);
+                switch (i) {
+                    case 0 : hasFlame = true; buffed.add(p); break;
+                    case 1 : hasBombs = true; buffed.add(p); break;
+                }
             }
         }
     }
@@ -168,17 +165,10 @@ public void checkBuff() {
                }
            }
        }
-       if(!bombs.isEmpty()) {
-           if ( this.x -16 > bombs.get(0).getX() +15 || this.x + 6 <bombs.get(0).getX() -15) {
-               if((x +6 >= bombs.get(0).getX() -16) && x -16 <=bombs.get(0).getX() +16) {
-                   if((y +16 >bombs.get(0).getY() - 16) && (y -16 <bombs.get(0).getY() +16)) {
-                       return  true;
-                   }
-               }
-           }
-           if (this.y - 16 > bombs.get(0).getY() + 15 || this.y + 16 <bombs.get(0).getY() -15) {
-               if((x +6 >= bombs.get(0).getX() -16) && x -16 <=bombs.get(0).getX() +16) {
-                   if((y +16 >bombs.get(0).getY() - 16) && (y -16 <bombs.get(0).getY() +16)) {
+       for(Entity p : bombs) {
+           if ( this.x -16 > p.getX() +15 || this.x + 6 <p.getX() -15 || this.y - 16 > p.getY() + 15 || this.y + 16 <p.getY() -15) {
+               if((x +6 >= p.getX() -16) && x -16 <=p.getX() +16) {
+                   if((y +16 >p.getY() - 16) && (y -16 <p.getY() +16)) {
                        return  true;
                    }
                }
@@ -186,8 +176,34 @@ public void checkBuff() {
        }
         return false;
     }
+    private void clearDeadEntity() {
+        List<Entity>brick = new ArrayList<>();
+        for(Entity p : bricks) {
+            if(p.getX() == 0 && p.getY() == 0) {
+                brick.add(p);
+            }
+        }
+        bricks.removeAll(brick);
+        List<Enemy>balloom = new ArrayList<>();
+        for(Enemy p : ballooms) {
+            if(p.getX() == 0 && p.getY() == 0) {
+                balloom.add(p);
+            }
+        }
+        ballooms.removeAll(balloom);
+    }
+    private void handleKill() {
+        for(Enemy p : ballooms) {
+            if (p.getX() - 16 < x +10 && p.getX() + 16 > x - 10) {
+                if (p.getY() + 16 > y - 16 && p.getY() - 16 < y + 16) {
+                    setKilled();
+                }
+            }
+        }
+    }
            @Override
     public void update() {
+               handleKill();
         if(goUp) {
             img = Sprite.movingSprite(Sprite.player_up,Sprite.player_up_1, Sprite.player_up_2, animated++, 40).getFxImage();
             if(!imPassable(x, y-1)) {
@@ -228,13 +244,14 @@ public void checkBuff() {
              checkBuff();
          }
          if(!isAlive()) {
-            if( die_animation == 100) {
+            if( die_animation == 200) {
                 x= 0; y=0;
                 img = Sprite.hide.getFxImage();
                 return;
             }
-             img = Sprite.movingSprite(Sprite.player_dead1, Sprite.player_dead2, Sprite.player_dead3, die_animation++, 200).getFxImage();
+             img = Sprite.movingSprite(Sprite.player_dead1, Sprite.player_dead2, Sprite.player_dead3, die_animation++, 400).getFxImage();
             die_animation++;
          }
+         clearDeadEntity();
     };   
     }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -13,16 +14,17 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+
 import uet.oop.bomberman.entities.*;
 import uet.oop.bomberman.graphics.Sprite;
-import uet.oop.bomberman.graphics.SpriteSheet;
+import uet.oop.bomberman.enemies.*;
 
 
 public class BombermanGame extends Application {
 
     public static final int WIDTH = 21;
     public static final int HEIGHT = 15;
-
+    public static int[][] map = new int[21][15];
     private GraphicsContext gc;
     private Canvas canvas;
     private List<Entity> entities = new ArrayList<>();
@@ -32,6 +34,7 @@ public class BombermanGame extends Application {
     private List<Entity> explodes = new ArrayList<>();
     private List<Entity> bricks = new ArrayList<>();
     private List<Entity> buffs = new ArrayList<>();
+    private List<Enemy> ballooms = new ArrayList<>();
     public static void main(String[] args) {
         Application.launch(BombermanGame.class);
     }
@@ -54,7 +57,7 @@ public class BombermanGame extends Application {
         stage.show();
         createMap();
 
-        Entity bomberman = new Bomber(1, 1, Sprite.player_right.getFxImage(), entities, walls, bomb, explodes, bricks, buffs);
+        Entity bomberman = new Bomber(1, 1, Sprite.player_right.getFxImage(), entities, walls, bomb, explodes, bricks, buffs, ballooms);
         entities.add(bomberman);
         AnimationTimer timer = new AnimationTimer() {
             @Override
@@ -71,7 +74,7 @@ public class BombermanGame extends Application {
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
-                if(((Bomber) bomberman).isAlive() == true) {
+                if (((Bomber) bomberman).isAlive()) {
                     switch (event.getCode()) {
                         case UP:
                             ((Bomber) bomberman).goUp = true;
@@ -98,7 +101,8 @@ public class BombermanGame extends Application {
                             ((Bomber) bomberman).goUp = false;
                             break;
                         case B:
-                            ((Bomber) bomberman).placeBomb();
+                                ((Bomber) bomberman).placeBomb();
+                            break;
                     }
                 }
             }
@@ -125,7 +129,6 @@ public class BombermanGame extends Application {
                 ((Bomber) bomberman).goLeft = false;
                 ((Bomber) bomberman).standLeft();
                 break;
-
         }
     }
     });
@@ -137,9 +140,11 @@ public class BombermanGame extends Application {
                 if (j == 0 || j == HEIGHT - 1 || i == 0 || i == WIDTH - 1) {
                     object = new Wall(i, j, Sprite.wall.getFxImage());
                     walls.add(object);
+                    map[i][j] = 0;
                 } else {
                     object = new Grass(i, j, Sprite.grass.getFxImage());
                     grass.add(object);
+                    map[i][j] = 1;
                 }
             }
         }
@@ -149,20 +154,43 @@ public class BombermanGame extends Application {
                      if(i%2==0 && j%2==0) {
                         object = new Wall(i, j, Sprite.wall.getFxImage());
                         walls.add(object);
+                        map[i][j] = 0;
                     }
                      else if ((j == 1 && i >= 3) || (i == 1 && j >= 3) || (i >= 3 && j >= 3 )) {
                          if ((int) Math.floor(Math.random() * 100 + 1) <= 30) {
                              object = new Brick(i, j, Sprite.brick.getFxImage());
                              bricks.add(object);
+                             map[i][j] = 2;
                          }
+//                         else if(i>3 && j>3 && (int) Math.floor(Math.random() * 100 + 1) <= 25) {
+//                             if(Ballooms.size() < 4) {
+//                                     Ballooms.add(new Balloom(i, j, Sprite.balloom_right1.getFxImage(), bricks, walls));
+//                             }
+//                         }
                      }
                 }
             }
-           Entity tmp = bricks.get((int) Math.floor(Math.random() * (bricks.size())));
-                Entity powerup_flames = new Buff(tmp.getX()/32, tmp.getY()/32, Sprite.powerup_flames.getFxImage());
-                buffs.add(powerup_flames);
-                System.out.println(powerup_flames.getX());
+            for(int i = 4; i < WIDTH - 2; i++) {
+                for(int j = 4; j < HEIGHT - 1; j++) {
+                    if(map[i][j] == 1 && (int) Math.floor(Math.random() * 100 + 1) <= 25) {
+                        if(ballooms.size() < 4) {
+                            ballooms.add(new Balloom(i, j, Sprite.balloom_right1.getFxImage(), bricks, walls, bomb));
+                            i+=2;
+                            j+=2;
+                        }
+                    }
+                }
+            }
+        Entity tmp1 = bricks.get((int) Math.floor(Math.random() * (bricks.size())));
+        Entity tmp2 = bricks.get((int) Math.floor(Math.random() * (bricks.size())));
+        Entity powerup_flames = new Buff(tmp1.getX()/32, tmp1.getY()/32, Sprite.powerup_flames.getFxImage());
+        Entity powerup_bombs = new Buff(tmp2.getX()/32, tmp2.getY()/32, Sprite.powerup_bombs.getFxImage());
+        buffs.add(powerup_flames);
+        buffs.add(powerup_bombs);
+        System.out.println(powerup_flames.getX());
         System.out.println(powerup_flames.getY());
+        System.out.println(powerup_bombs.getX());
+        System.out.println(powerup_bombs.getY());
     }
 
 
@@ -170,8 +198,11 @@ public class BombermanGame extends Application {
         if(!entities.isEmpty()) {
             entities.forEach(Entity::update);
         }
-        bomb.forEach(Entity::update);
+        if(!bomb.isEmpty()) {
+            bomb.forEach(Entity::update);
+        }
         bricks.forEach(Entity::update);
+        ballooms.forEach(Enemy::update);
     }
 
     public void render() {
@@ -183,5 +214,6 @@ public class BombermanGame extends Application {
         entities.forEach(g -> g.render(gc));
         bomb.forEach(g -> g.render(gc));
         explodes.forEach(g -> g.render(gc));
+        ballooms.forEach(g -> g.render(gc));
     }
 }
