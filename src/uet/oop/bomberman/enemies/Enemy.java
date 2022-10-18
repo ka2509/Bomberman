@@ -9,6 +9,7 @@ public abstract class Enemy {
     protected double x;
     protected double y;
     protected Image img;
+    public boolean onPath = false;
     protected boolean isAlive;
     public Enemy( int xUnit, int yUnit,Image img) {
         this.x = xUnit * Sprite.SCALED_SIZE;
@@ -17,6 +18,7 @@ public abstract class Enemy {
         isAlive = true;
     }
     public abstract void update();
+
     public void render(GraphicsContext gc) {
         gc.drawImage(img, x, y);
     }

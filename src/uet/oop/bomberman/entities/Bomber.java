@@ -3,11 +3,8 @@ import javafx.application.Platform;
 import uet.oop.bomberman.enemies.Balloom;
 import uet.oop.bomberman.enemies.Enemy;
 import uet.oop.bomberman.graphics.Sprite;
-import javafx.event.Event;
-import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.SnapshotParameters;
-import javafx.scene.canvas.GraphicsContext;
+import uet.oop.bomberman.BombermanGame;
+
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -177,7 +174,7 @@ public void checkBuff() {
     buffs.removeAll(buffed);
 }
    private boolean imPassable(int x, int y) {
-        if(x < 32 || y < 32 || x > 616 || y > 416  ) {
+        if(x < 32 || y < 32 || x > 8 + (BombermanGame.WIDTH - 2)*32 || y > (BombermanGame.HEIGHT - 2)*32) {
             return true;
         }
        for(Entity p : walls) {

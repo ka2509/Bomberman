@@ -15,6 +15,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
+import uet.oop.bomberman.ai.PathFinder;
 import uet.oop.bomberman.entities.*;
 import uet.oop.bomberman.graphics.Sprite;
 import uet.oop.bomberman.enemies.*;
@@ -24,9 +25,10 @@ public class BombermanGame extends Application {
 
     public static final int WIDTH = 21;
     public static final int HEIGHT = 15;
-    public static int[][] map = new int[21][15];
+    public static int[][] map = new int[WIDTH][HEIGHT];
     private GraphicsContext gc;
     private Canvas canvas;
+    public static PathFinder pFinder = new PathFinder();
     private List<Entity> entities = new ArrayList<>();
     private List<Entity> grass = new ArrayList<>();
     private List<Entity> walls = new ArrayList<>();
@@ -43,7 +45,7 @@ public class BombermanGame extends Application {
     @Override
     public void start(Stage stage) {
         // Tao Canvas
-        canvas = new Canvas(Sprite.SCALED_SIZE * WIDTH, Sprite.SCALED_SIZE * HEIGHT);
+        canvas = new Canvas(Sprite.SCALED_SIZE * WIDTH, Sprite.SCALED_SIZE * (HEIGHT));
         gc = canvas.getGraphicsContext2D();
 
         // Tao root container
@@ -182,7 +184,7 @@ public class BombermanGame extends Application {
                     }
                     else if(map[i][j] == 1 && (int) Math.floor(Math.random() * 100 + 1) <= 25) {
                         if(oneAls.size() == 0) {
-                            oneAls.add(new oneAl(i, j, Sprite.oneal_right1.getFxImage(),entities));
+                            oneAls.add(new oneAl(i, j, Sprite.oneal_right1.getFxImage(),entities, bricks, walls, bomb));
                         }
                     }
                 }

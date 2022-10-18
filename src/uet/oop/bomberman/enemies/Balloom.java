@@ -1,6 +1,7 @@
 package uet.oop.bomberman.enemies;
 
 import javafx.scene.image.Image;
+import uet.oop.bomberman.BombermanGame;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.graphics.Sprite;
 
@@ -95,7 +96,7 @@ public class Balloom extends Enemy{
         isAlive = false;
     }
     private boolean imPassable(double x, double y) {
-        if(x < 32 || y < 32 || x > 616 || y > 416  ) {
+        if(x < 32 || y < 32 || x > 8 + (BombermanGame.WIDTH - 2)*32 || y > (BombermanGame.HEIGHT - 2)*32) {
             return true;
         }
         for(Entity p : walls) {
