@@ -31,6 +31,7 @@ public class Bomber extends Entity {
    private int animated =0;
    private int die_animated = 0;
     private boolean hasActiveBomb;
+    private boolean canActiveBomb2;
     private List<Entity> entities = new ArrayList<>();
     private List<Entity> walls = new ArrayList<>();
     private List<Entity> bombs = new ArrayList<>();
@@ -52,8 +53,9 @@ public class Bomber extends Entity {
         this.ballooms = ballooms;
         hasActiveBomb = false;
         isAlive = true;
-        hasFlame = true;
-        hasBombs = true;
+        hasFlame = false;
+        hasBombs = false;
+        canActiveBomb2 = false;
     } 
    public void standUp() {
       img = Sprite.player_up.getFxImage();
@@ -75,11 +77,65 @@ public class Bomber extends Entity {
            else if (hasBombs && bombs.size() ==2) {
                return;
            }
+           if(hasActiveBomb == false && hasBombs == false) {
+               bomb.x = Sprite.SCALED_SIZE * (x / Sprite.SCALED_SIZE);
+               bomb.y = Sprite.SCALED_SIZE * (y / Sprite.SCALED_SIZE);
+               new Thread(() -> {
+                   try {
+                       hasActiveBomb = true;
+                       Platform.runLater(() -> {
+                           ((Bomb) bomb).setBomb(bomb);
+                       });
+                       Thread.sleep(1500);
+                       Platform.runLater(() -> {
+                           ((Bomb) bomb).explode();
+                       });
+                       Thread.sleep(300);
+                       Platform.runLater(() -> {
+                           ((Bomb) bomb).clear();
+                       });
+                       Thread.sleep(100);
+                       hasActiveBomb = false;
+                   } catch (InterruptedException e) {
+                       e.printStackTrace();
+                   }
+               }).start();
+               return;
+           }
+           if(hasActiveBomb == false && hasBombs == true) {
+               bomb.x = Sprite.SCALED_SIZE * (x / Sprite.SCALED_SIZE);
+               bomb.y = Sprite.SCALED_SIZE * (y / Sprite.SCALED_SIZE);
+               new Thread(() -> {
+                   try {
+                       hasActiveBomb = true;
+                       Platform.runLater(() -> {
+                           ((Bomb) bomb).setBomb(bomb);
+                       });
+                       Thread.sleep(500);
+                       if(hasBombs) {
+                           canActiveBomb2 = true;
+                       }
+                       Thread.sleep(1000);
+                       Platform.runLater(() -> {
+                           ((Bomb) bomb).explode();
+                       });
+                       Thread.sleep(300);
+                       Platform.runLater(() -> {
+                           ((Bomb) bomb).clear();
+                       });
+                       Thread.sleep(100);
+                       hasActiveBomb = false;
+                       canActiveBomb2 = false;
+                   } catch (InterruptedException e) {
+                       e.printStackTrace();
+                   }
+               }).start();
+           }
+           else if (canActiveBomb2 == true) {
            bomb.x = Sprite.SCALED_SIZE * (x / Sprite.SCALED_SIZE);
            bomb.y = Sprite.SCALED_SIZE * (y / Sprite.SCALED_SIZE);
            new Thread(() -> {
                try {
-                   hasActiveBomb = true;
                    Platform.runLater(() -> {
                        ((Bomb) bomb).setBomb(bomb);
                    });
@@ -92,11 +148,12 @@ public class Bomber extends Entity {
                        ((Bomb) bomb).clear();
                    });
                    Thread.sleep(100);
-                   hasActiveBomb = false;
                } catch (InterruptedException e) {
                    e.printStackTrace();
                }
            }).start();
+       }
+
    }
    void setKilled() {
         isAlive = false;

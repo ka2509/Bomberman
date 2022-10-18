@@ -62,7 +62,6 @@ public class Balloom extends Enemy{
     }
     private void choseDir() {
        ArrayList<Integer> availableDir = new ArrayList<>();
-        availableDir.clear();
         if(!imPassable(x+0.5, y)) {
             availableDir.add(0);
         }
@@ -84,7 +83,7 @@ public class Balloom extends Enemy{
             dir = availableDir.get(ranDir);
         }
     }
-    public void balloonMoving() {
+    public void balloomMoving() {
         switch (dir) {
             case 0: moveRight(); break;
             case 1: moveUp(); break;
@@ -134,7 +133,7 @@ public class Balloom extends Enemy{
             die_animation++;
         }
         else {
-            balloonMoving();
+            balloomMoving();
         }
 
     }

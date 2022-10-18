@@ -35,6 +35,7 @@ public class BombermanGame extends Application {
     private List<Entity> bricks = new ArrayList<>();
     private List<Entity> buffs = new ArrayList<>();
     private List<Enemy> ballooms = new ArrayList<>();
+    private List<Enemy> oneAls = new ArrayList<>();
     public static void main(String[] args) {
         Application.launch(BombermanGame.class);
     }
@@ -173,10 +174,15 @@ public class BombermanGame extends Application {
             for(int i = 4; i < WIDTH - 2; i++) {
                 for(int j = 4; j < HEIGHT - 1; j++) {
                     if(map[i][j] == 1 && (int) Math.floor(Math.random() * 100 + 1) <= 25) {
-                        if(ballooms.size() < 4) {
+                        if(ballooms.size() < 5) {
                             ballooms.add(new Balloom(i, j, Sprite.balloom_right1.getFxImage(), bricks, walls, bomb));
                             i+=2;
                             j+=2;
+                        }
+                    }
+                    else if(map[i][j] == 1 && (int) Math.floor(Math.random() * 100 + 1) <= 25) {
+                        if(oneAls.size() == 0) {
+                            oneAls.add(new oneAl(i, j, Sprite.oneal_right1.getFxImage(),entities));
                         }
                     }
                 }
@@ -203,6 +209,7 @@ public class BombermanGame extends Application {
         }
         bricks.forEach(Entity::update);
         ballooms.forEach(Enemy::update);
+        oneAls.forEach(Enemy::update);
     }
 
     public void render() {
@@ -215,5 +222,6 @@ public class BombermanGame extends Application {
         bomb.forEach(g -> g.render(gc));
         explodes.forEach(g -> g.render(gc));
         ballooms.forEach(g -> g.render(gc));
+        oneAls.forEach(g -> g.render(gc));
     }
 }
