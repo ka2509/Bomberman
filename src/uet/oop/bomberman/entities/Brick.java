@@ -5,10 +5,11 @@ import uet.oop.bomberman.graphics.Sprite;
 
 public class Brick extends Entity {
     private boolean destroyed;
-    private int animated = 0;
+    private int animated ;
     private int destroy_animation = 0;
     public Brick(int x, int y, Image image) {
         super(x, y, image);
+        animated = 0;
     }
     public void destroy() {
         destroyed = true;

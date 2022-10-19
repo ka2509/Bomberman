@@ -5,6 +5,7 @@ import uet.oop.bomberman.BombermanGame;
 
 public class PathFinder {
         Node[][] node;
+        public int checkIfcanmove = 0;
         ArrayList<Node> openList = new ArrayList<>();
         public ArrayList<Node> pathList = new ArrayList<>();
         Node startNode, goalNode, currentNode;
@@ -55,7 +56,7 @@ public class PathFinder {
                 int row =0;
                 while(col < BombermanGame.WIDTH && row < BombermanGame.HEIGHT) {
                         int tileNum  = BombermanGame.map[col][row];
-                        if(tileNum == 0 || tileNum == 2) {
+                        if(tileNum == 0) {
                                 node[col][row].solid = true;
                         }
                         getCost(node[col][row]);
@@ -73,7 +74,7 @@ public class PathFinder {
                 node.gCost = xDistance + yDistance;
                 // H cost
                 xDistance = Math.abs(node.col - goalNode.col);
-                xDistance = Math.abs(node.row - goalNode.row);
+                yDistance = Math.abs(node.row - goalNode.row);
                 node.hCost = xDistance + yDistance;
                 // F cost
                 node.fCost = node.gCost + node.hCost;
@@ -82,7 +83,7 @@ public class PathFinder {
                 while(goalReached == false && step < 500) {
                         int col = currentNode.col;
                         int row = currentNode.row;
-
+                        checkIfcanmove = 0;
                         //Check the current node
                         currentNode.checked = true;
                         openList.remove(currentNode);
@@ -102,15 +103,15 @@ public class PathFinder {
                         }
                         //find the best node
                         int bestNodeIndex = 0;
-                        int besNodefCost = 999;
+                        int bestNodefCost = 999;
                         for(int i = 0; i < openList.size(); i++) {
                                 //Check if this node's Fcost is better
-                                if(openList.get(i).fCost < besNodefCost) {
-                                        besNodefCost = openList.get(i).fCost;
+                                if(openList.get(i).fCost < bestNodefCost) {
+                                        bestNodefCost = openList.get(i).fCost;
                                         bestNodeIndex =  i;
                                 }
                                 //if fCost is equal check the gCost
-                                else if(openList.get(i).fCost == besNodefCost) {
+                                else if(openList.get(i).fCost == bestNodefCost) {
                                         if(openList.get(i).gCost < openList.get(bestNodeIndex).gCost) {
                                                 bestNodeIndex = i;
                                         }
@@ -127,6 +128,9 @@ public class PathFinder {
                                 trackThePath();
                         }
                         step++;
+//                        if(checkIfcanmove == 0) {
+//                                return false;
+//                        }
                 }
                 return goalReached;
         }
@@ -135,6 +139,7 @@ public class PathFinder {
                         node.open = true;
                         node.parent = currentNode;
                         openList.add(node);
+                        checkIfcanmove++;
                 }
         }
         public void trackThePath() {

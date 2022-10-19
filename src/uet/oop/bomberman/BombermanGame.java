@@ -28,7 +28,7 @@ public class BombermanGame extends Application {
     public static int[][] map = new int[WIDTH][HEIGHT];
     private GraphicsContext gc;
     private Canvas canvas;
-    public static PathFinder pFinder = new PathFinder();
+    private PathFinder pFinder = new PathFinder();
     private List<Entity> entities = new ArrayList<>();
     private List<Entity> grass = new ArrayList<>();
     private List<Entity> walls = new ArrayList<>();
@@ -184,7 +184,7 @@ public class BombermanGame extends Application {
                     }
                     else if(map[i][j] == 1 && (int) Math.floor(Math.random() * 100 + 1) <= 25) {
                         if(oneAls.size() == 0) {
-                            oneAls.add(new oneAl(i, j, Sprite.oneal_right1.getFxImage(),entities, bricks, walls, bomb));
+                            oneAls.add(new oneAl(i, j, Sprite.oneal_right1.getFxImage(), bricks, walls, bomb,pFinder,entities));
                         }
                     }
                 }

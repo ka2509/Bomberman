@@ -25,8 +25,7 @@ public class Bomber extends Entity {
    private boolean  isAlive;
    private boolean hasFlame;
    private boolean hasBombs;
-   private int animated =0;
-   private int die_animated = 0;
+   private int animated ;
     private boolean hasActiveBomb;
     private boolean canActiveBomb2;
     private List<Entity> entities = new ArrayList<>();
@@ -41,6 +40,7 @@ public class Bomber extends Entity {
                   List<Entity> explodes, List<Entity> bricks,
                   List<Entity> buffs, List<Enemy> ballooms) {
         super( x, y, img);
+        animated = 0;
         this.entities = entities;
         this.walls = walls;
         this.bombs = bombs;
@@ -270,7 +270,8 @@ public void checkBuff() {
          if(goRight) {
             img = Sprite.movingSprite(Sprite.player_right,Sprite.player_right_1, Sprite.player_right_2, animated++, 40).getFxImage();
             if(!imPassable(x+1,y)) {
-                x += 1;
+                 x += 1;
+                //x += 1;
                 //checkBuff();
             }
 //             System.out.println("Right:" + x);

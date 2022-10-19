@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Bomb  extends Entity{
-    private int animated =0;
+    private int animated;
     private boolean setBomb = false;
     private boolean bombExploded =false;
     private List<Entity> entities = new ArrayList<>();
@@ -31,6 +31,7 @@ public class Bomb  extends Entity{
       this.radius = radius;
       this.walls = walls;
       this.bombs = bombs;
+      animated = 0;
       this.explodes =explodes;
       this.bricks = bricks;
       this.ballooms = ballooms;
