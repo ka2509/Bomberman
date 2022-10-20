@@ -32,9 +32,9 @@ public class BombermanGame extends Application {
     private List<Entity> entities = new ArrayList<>();
     private List<Entity> grass = new ArrayList<>();
     private List<Entity> walls = new ArrayList<>();
-    private List<Entity> bomb = new ArrayList<>();
+    public static List<Entity> bomb = new ArrayList<>();
     private List<Entity> explodes = new ArrayList<>();
-    private List<Entity> bricks = new ArrayList<>();
+    public static List<Entity> bricks = new ArrayList<>();
     private List<Entity> buffs = new ArrayList<>();
     private List<Enemy> ballooms = new ArrayList<>();
     private List<Enemy> oneAls = new ArrayList<>();
@@ -60,7 +60,10 @@ public class BombermanGame extends Application {
         stage.show();
         createMap();
 
-        Entity bomberman = new Bomber(1, 1, Sprite.player_right.getFxImage(), entities, walls, bomb, explodes, bricks, buffs, ballooms);
+        Entity bomberman = new Bomber(1, 1, Sprite.player_right.getFxImage(),
+                entities, walls, bomb,
+                explodes, bricks, buffs,
+                ballooms, oneAls);
         entities.add(bomberman);
         AnimationTimer timer = new AnimationTimer() {
             @Override
@@ -68,6 +71,9 @@ public class BombermanGame extends Application {
                 update();
                 render();
                 if(((Bomber)bomberman).isAlive()) {initscene(scene, bomberman);}
+                if(checkWin()) {
+                    System.out.println("end game");
+                }
             }
         };
         timer.start();
@@ -165,15 +171,10 @@ public class BombermanGame extends Application {
                              bricks.add(object);
                              map[i][j] = 2;
                          }
-//                         else if(i>3 && j>3 && (int) Math.floor(Math.random() * 100 + 1) <= 25) {
-//                             if(Ballooms.size() < 4) {
-//                                     Ballooms.add(new Balloom(i, j, Sprite.balloom_right1.getFxImage(), bricks, walls));
-//                             }
-//                         }
                      }
                 }
             }
-            for(int i = 4; i < WIDTH - 2; i++) {
+            for(int i = 4; i < WIDTH - 1; i++) {
                 for(int j = 4; j < HEIGHT - 1; j++) {
                     if(map[i][j] == 1 && (int) Math.floor(Math.random() * 100 + 1) <= 25) {
                         if(ballooms.size() < 5) {
@@ -182,7 +183,7 @@ public class BombermanGame extends Application {
                             j+=2;
                         }
                     }
-                    else if(map[i][j] == 1 && (int) Math.floor(Math.random() * 100 + 1) <= 25) {
+                    else if(i > 5 && j > 5 && map[i][j] == 1 && (int) Math.floor(Math.random() * 100 + 1) <= 50) {
                         if(oneAls.size() == 0) {
                             oneAls.add(new oneAl(i, j, Sprite.oneal_right1.getFxImage(), bricks, walls, bomb,pFinder,entities));
                         }
@@ -200,7 +201,12 @@ public class BombermanGame extends Application {
         System.out.println(powerup_bombs.getX());
         System.out.println(powerup_bombs.getY());
     }
-
+    public boolean checkWin() {
+        if(ballooms.isEmpty()) {
+            return true;
+        }
+        return false;
+    }
 
     public void update() {
         if(!entities.isEmpty()) {

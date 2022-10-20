@@ -1,5 +1,6 @@
 package uet.oop.bomberman.entities;
 import javafx.application.Platform;
+import javafx.scene.paint.ImagePattern;
 import uet.oop.bomberman.enemies.Balloom;
 import uet.oop.bomberman.enemies.Enemy;
 import uet.oop.bomberman.graphics.Sprite;
@@ -35,10 +36,12 @@ public class Bomber extends Entity {
     private List<Entity> explodes = new ArrayList<>();
     private List<Entity> buffs = new ArrayList<>();
     private List<Enemy> ballooms = new ArrayList<>();
+    private List<Enemy> oneAls = new ArrayList<>();
     public Bomber(int x, int y, Image img, List<Entity> entities,
                   List<Entity> walls, List<Entity> bombs,
                   List<Entity> explodes, List<Entity> bricks,
-                  List<Entity> buffs, List<Enemy> ballooms) {
+                  List<Entity> buffs, List<Enemy> ballooms,
+                  List<Enemy> oneAls) {
         super( x, y, img);
         animated = 0;
         this.entities = entities;
@@ -48,6 +51,7 @@ public class Bomber extends Entity {
         this.bricks = bricks;
         this.buffs = buffs;
         this.ballooms = ballooms;
+        this.oneAls = oneAls;
         hasActiveBomb = false;
         isAlive = true;
         hasFlame = false;
@@ -67,7 +71,9 @@ public class Bomber extends Entity {
       img = Sprite.player_down.getFxImage();
    }
    public void placeBomb() {
-           Entity bomb = new Bomb(hasFlame ? 2 : 1, entities, walls, bombs, explodes, bricks, ballooms);
+           Entity bomb = new Bomb(hasFlame ? 2 : 1, entities,
+                   walls, bombs, explodes,
+                   bricks, ballooms, oneAls);
            if (!hasBombs && hasActiveBomb) {
                return;
            }
@@ -77,6 +83,7 @@ public class Bomber extends Entity {
            if(hasActiveBomb == false && hasBombs == false) {
                bomb.x = Sprite.SCALED_SIZE * (x / Sprite.SCALED_SIZE);
                bomb.y = Sprite.SCALED_SIZE * (y / Sprite.SCALED_SIZE);
+               BombermanGame.map[x / Sprite.SCALED_SIZE][y / Sprite.SCALED_SIZE] = 3;
                new Thread(() -> {
                    try {
                        hasActiveBomb = true;
@@ -109,9 +116,7 @@ public class Bomber extends Entity {
                            ((Bomb) bomb).setBomb(bomb);
                        });
                        Thread.sleep(500);
-                       if(hasBombs) {
-                           canActiveBomb2 = true;
-                       }
+                       canActiveBomb2 = true;
                        Thread.sleep(1000);
                        Platform.runLater(() -> {
                            ((Bomb) bomb).explode();
@@ -128,7 +133,7 @@ public class Bomber extends Entity {
                    }
                }).start();
            }
-           else if (canActiveBomb2 == true) {
+            if (canActiveBomb2 == true) {
            bomb.x = Sprite.SCALED_SIZE * (x / Sprite.SCALED_SIZE);
            bomb.y = Sprite.SCALED_SIZE * (y / Sprite.SCALED_SIZE);
            new Thread(() -> {
@@ -165,8 +170,17 @@ public void checkBuff() {
             if(this.x - 10 <= p.getX() + 10 && this.x +10 >= p.getX() -10) {
             if(this.y +16 >= p.getY() - 10 && this.y -16 <= p.getY() +10) {
                 switch (i) {
-                    case 0 : hasFlame = true; buffed.add(p); break;
+                    case 0 :
+                        if(hasFlame == false) {
+                            hasFlame = true;
+                        }
+                        else {
+                            hasBombs = true;
+                        }
+                        buffed.add(p);
+                        break;
                     case 1 : hasBombs = true; buffed.add(p); break;
+                    default: break;
                 }
             }
         }
@@ -233,8 +247,11 @@ public void checkBuff() {
     private void clearDeadEntity() {
         List<Entity>brick = new ArrayList<>();
         for(Entity p : bricks) {
-            if(p.getX() == 0 && p.getY() == 0) {
+            int dieX = p.getX();
+            int dieY = p.getY();
+            if(dieX == 0 && dieY == 0) {
                 brick.add(p);
+                BombermanGame.map[dieX/Sprite.SCALED_SIZE][dieY/Sprite.SCALED_SIZE] = 1;
             }
         }
         bricks.removeAll(brick);
@@ -245,9 +262,23 @@ public void checkBuff() {
             }
         }
         ballooms.removeAll(balloom);
+        List<Enemy>oneAl = new ArrayList<>();
+        for(Enemy p : oneAl) {
+            if(p.getX() == 0 && p.getY() == 0) {
+                oneAl.add(p);
+            }
+        }
+        oneAls.removeAll(oneAl);
     }
     private void handleKill() {
         for(Enemy p : ballooms) {
+            if (p.getX() - 16 < x +10 && p.getX() + 16 > x - 10) {
+                if (p.getY() + 16 > y - 16 && p.getY() - 16 < y + 16) {
+                    setKilled();
+                }
+            }
+        }
+        for(Enemy p : oneAls) {
             if (p.getX() - 16 < x +10 && p.getX() + 16 > x - 10) {
                 if (p.getY() + 16 > y - 16 && p.getY() - 16 < y + 16) {
                     setKilled();

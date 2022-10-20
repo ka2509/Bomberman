@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Random;
 
 public class Balloom extends Enemy{
-    private int die_animation = 0;
     public Balloom(int xUnit, int yUnit, Image img,
                    List<Entity> bricks,
                    List<Entity> walls,
@@ -55,15 +54,12 @@ public class Balloom extends Enemy{
                 break;
         }
     }
-    public void setKilled() {
-        isAlive = false;
-    }
     @Override
     public void update() {
         if(!isAlive) {
             if(die_animation == 40) {
                 img  = Sprite.hide.getFxImage();
-                x = 0; y=0;
+                x = 0; y = 0;
                 return;
             }
             img  = Sprite.movingSprite(Sprite.balloom_dead, Sprite.hide, Sprite.hide, animated++, 40).getFxImage();

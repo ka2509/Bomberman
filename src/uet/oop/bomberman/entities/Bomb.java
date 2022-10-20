@@ -2,8 +2,10 @@ package uet.oop.bomberman.entities;
 
 import javafx.application.Platform;
 import javafx.scene.image.Image;
+import uet.oop.bomberman.BombermanGame;
 import uet.oop.bomberman.enemies.Balloom;
 import uet.oop.bomberman.enemies.Enemy;
+import uet.oop.bomberman.enemies.oneAl;
 import uet.oop.bomberman.graphics.Sprite;
 import uet.oop.bomberman.graphics.SpriteSheet;
 
@@ -21,16 +23,18 @@ public class Bomb  extends Entity{
     private List<Entity> explodes = new ArrayList<>();
     private List<Entity> bricks= new ArrayList<>();
     private List<Enemy> ballooms = new ArrayList<>();
+    private List<Enemy> oneAls = new ArrayList<>();
     private int bombCount = 0;
     private int radius;
     public Bomb(int radius, List<Entity> entities,
                 List<Entity> walls,List<Entity> bombs,
                 List<Entity> explodes, List<Entity> bricks,
-                List<Enemy> ballooms) {
+                List<Enemy> ballooms, List<Enemy> oneAls) {
       this.entities = entities;
       this.radius = radius;
       this.walls = walls;
       this.bombs = bombs;
+      this.oneAls = oneAls;
       animated = 0;
       this.explodes =explodes;
       this.bricks = bricks;
@@ -55,6 +59,7 @@ public class Bomb  extends Entity{
         return true;
     }
     public void explode() {
+        BombermanGame.map[x/Sprite.SCALED_SIZE][y/Sprite.SCALED_SIZE] = 1;
         bombExploded = true;
         expLeft();
         expRight();
@@ -70,7 +75,14 @@ public class Bomb  extends Entity{
         for (Enemy p : ballooms) {
             if (p.getX() - 16 <= x +16 && p.getX() + 16 >= x - 16) {
                 if (p.getY() + 16 >= y - 10 && p.getY() - 16 <= y + 10) {
-                    ((Balloom) p).setKilled();
+                     p.setKilled();
+                }
+            }
+        }
+        for (Enemy p : oneAls) {
+            if (p.getX() - 16 <= x +16 && p.getX() + 16 >= x - 16) {
+                if (p.getY() + 16 >= y - 10 && p.getY() - 16 <= y + 10) {
+                    p.setKilled();
                 }
             }
         }
@@ -111,7 +123,14 @@ public class Bomb  extends Entity{
             for (Enemy p : ballooms) {
                 if (p.getX() - 10 <= left.getX() +16 && p.getX() + 10 >= left.getX() - 16) {
                     if (p.getY() + 16 >= left.getY() - 10 && p.getY() - 16 <= left.getY() + 10) {
-                        ((Balloom) p).setKilled();
+                         p.setKilled();
+                    }
+                }
+            }
+            for (Enemy p :oneAls) {
+                if (p.getX() - 10 <= left.getX() +16 && p.getX() + 10 >= left.getX() - 16) {
+                    if (p.getY() + 16 >= left.getY() - 10 && p.getY() - 16 <= left.getY() + 10) {
+                        p.setKilled();
                     }
                 }
             }
@@ -152,7 +171,14 @@ public class Bomb  extends Entity{
             for (Enemy p : ballooms) {
                 if (p.getX() - 10 <= right.getX() + 16 && p.getX() + 10 >= right.getX() - 16) {
                     if (p.getY() + 16 >= right.getY() - 10 && p.getY() - 16 <= right.getY() + 10) {
-                        ((Balloom) p).setKilled();
+                        p.setKilled();
+                    }
+                }
+            }
+            for (Enemy p : oneAls) {
+                if (p.getX() - 10 <= right.getX() + 16 && p.getX() + 10 >= right.getX() - 16) {
+                    if (p.getY() + 16 >= right.getY() - 10 && p.getY() - 16 <= right.getY() + 10) {
+                        p.setKilled();
                     }
                 }
             }
@@ -193,7 +219,14 @@ public class Bomb  extends Entity{
             for (Enemy p : ballooms) {
                 if (p.getX() + 16 >= top.getX() - 10 && p.getX() - 16 <= top.getX() + 10) {
                     if (p.getY() + 16 >= top.getY() - 10 && p.getY() - 16 <= top.getY() + 10) {
-                        ((Balloom) p).setKilled();
+                        p.setKilled();
+                    }
+                }
+            }
+            for (Enemy p : oneAls) {
+                if (p.getX() + 16 >= top.getX() - 10 && p.getX() - 16 <= top.getX() + 10) {
+                    if (p.getY() + 16 >= top.getY() - 10 && p.getY() - 16 <= top.getY() + 10) {
+                        p.setKilled();
                     }
                 }
             }
@@ -234,14 +267,21 @@ public class Bomb  extends Entity{
                 for (Enemy p : ballooms) {
                     if (p.getX() + 16 >= bot.getX() - 10 && p.getX() - 16 <= bot.getX() + 10) {
                         if (p.getY() + 16 >= bot.getY() - 10 && p.getY() - 16 <= bot.getY() + 10) {
-                            ((Balloom) p).setKilled();
+                            p.setKilled();
                         }
                     }
                 }
+            for (Enemy p : oneAls) {
+                if (p.getX() + 16 >= bot.getX() - 10 && p.getX() - 16 <= bot.getX() + 10) {
+                    if (p.getY() + 16 >= bot.getY() - 10 && p.getY() - 16 <= bot.getY() + 10) {
+                        p.setKilled();
+                    }
+                }
+            }
         }
     }
     public void clear() {
-       bombs.remove(0);
+        bombs.remove(0);
         while(!explodes.isEmpty()) {
             explodes.remove(0);
         }

@@ -20,6 +20,7 @@ public abstract class Enemy {
     protected int dir;
     //bien animation
     protected int animated;
+    protected int die_animation;
     protected boolean isAlive;
     private List<Entity> bricks= new ArrayList<>();
     private List<Entity> walls = new ArrayList<>();
@@ -35,9 +36,14 @@ public abstract class Enemy {
         this.walls = walls;
         this.bomb = bomb;
         dir = 0;
+        animated = 0;
+        die_animation = 0;
         isAlive = true;
     }
     public abstract void update();
+    public void setKilled() {
+        isAlive = false;
+    }
     protected void choseDir(double speed) {
         ArrayList<Integer> availableDir = new ArrayList<>();
         if(!imPassable(x+speed, y)) {

@@ -2,10 +2,10 @@ package uet.oop.bomberman.ai;
 
 import java.util.ArrayList;
 import uet.oop.bomberman.BombermanGame;
+import uet.oop.bomberman.graphics.Sprite;
 
 public class PathFinder {
         Node[][] node;
-        public int checkIfcanmove = 0;
         ArrayList<Node> openList = new ArrayList<>();
         public ArrayList<Node> pathList = new ArrayList<>();
         Node startNode, goalNode, currentNode;
@@ -56,8 +56,15 @@ public class PathFinder {
                 int row =0;
                 while(col < BombermanGame.WIDTH && row < BombermanGame.HEIGHT) {
                         int tileNum  = BombermanGame.map[col][row];
-                        if(tileNum == 0) {
+                        if(tileNum == 0 || tileNum == 3) {
                                 node[col][row].solid = true;
+                        }
+                        for(int i =0; i< BombermanGame.bricks.size(); i++) {
+                                if(BombermanGame.bricks.get(i) != null) {
+                                        int bCol = BombermanGame.bricks.get(i).getX()/Sprite.SCALED_SIZE;
+                                        int bRow = BombermanGame.bricks.get(i).getY()/Sprite.SCALED_SIZE;
+                                        node[bCol][bRow].solid = true;
+                                }
                         }
                         getCost(node[col][row]);
                         col++;
@@ -83,7 +90,6 @@ public class PathFinder {
                 while(goalReached == false && step < 500) {
                         int col = currentNode.col;
                         int row = currentNode.row;
-                        checkIfcanmove = 0;
                         //Check the current node
                         currentNode.checked = true;
                         openList.remove(currentNode);
@@ -128,9 +134,6 @@ public class PathFinder {
                                 trackThePath();
                         }
                         step++;
-//                        if(checkIfcanmove == 0) {
-//                                return false;
-//                        }
                 }
                 return goalReached;
         }
@@ -139,7 +142,6 @@ public class PathFinder {
                         node.open = true;
                         node.parent = currentNode;
                         openList.add(node);
-                        checkIfcanmove++;
                 }
         }
         public void trackThePath() {
