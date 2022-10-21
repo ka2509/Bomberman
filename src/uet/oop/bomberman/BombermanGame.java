@@ -2,11 +2,9 @@ package uet.oop.bomberman;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -19,7 +17,7 @@ import uet.oop.bomberman.ai.PathFinder;
 import uet.oop.bomberman.entities.*;
 import uet.oop.bomberman.graphics.Sprite;
 import uet.oop.bomberman.enemies.*;
-
+import  uet.oop.bomberman.media.*;
 
 public class BombermanGame extends Application {
 
@@ -47,7 +45,9 @@ public class BombermanGame extends Application {
     public static boolean isWin = false;
     private boolean pauseStatus = false;
    public static boolean replay = false;
+    public int play1timewinsound = 1;
    public int test = 1;
+   public int soundWalk = 0;
     @Override
     public void start(Stage stage) {
         // Tao Canvas
@@ -67,25 +67,24 @@ public class BombermanGame extends Application {
         // Them scene vao stage
         stage.setScene(scene);
         stage.show();
-        //createMap();
-//        Entity bomberman = new Bomber(1, 1, Sprite.player_right.getFxImage(),
-//                entities, walls, bomb,
-//                explodes, bricks, buffs,
-//                ballooms, oneAls);
-//        entities.add(bomberman);
-//        Entity aTime = new Counter(0, 0, Sprite.two.getFxImage(), timer);
-//        Entity bTime = new Counter(1, 0, Sprite.zero.getFxImage(), timer);
-//        Entity cTime = new Counter(2, 0, Sprite.zero.getFxImage(), timer);
-//        timer.add(aTime);
-//        timer.add(bTime);
-//        timer.add(cTime);
+        if(GameMedia.getMainMenuSound() == null) {
+            GameMedia.setMainMenuSound();
+            GameMedia.getMainMenuSound().play();
+        } else {
+            if(GameMedia.getMainMenuSound().getCurrentTime().equals(GameMedia.getMainMenuSound().getStopTime())) {
+                GameMedia.setMainMenuSoundToNull();
+            }
+        }
         menu.render(gc);
+        GameMedia.setRestartSound();
+        GameMedia.setWinSound();
             scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
                 @Override
                 public void handle(KeyEvent event) {
                     switch (event.getCode()) {
                         case ENTER:
-                            handleGamePlay(/*bomberman,*/scene,stage);
+                            GameMedia.getMainMenuSound().stop();
+                            handleGamePlay(scene,stage);
                             break;
                         case ESCAPE:
                             stage.close();
@@ -94,7 +93,15 @@ public class BombermanGame extends Application {
             });
     }
     public void handleGamePlay(Scene scene, Stage stage) {
-            Entity bomberman = new Bomber(1, 1, Sprite.player_right.getFxImage(),
+        if(GameMedia.getThemeSound() == null) {
+            GameMedia.setThemeSound();
+            GameMedia.getThemeSound().play();
+        } else {
+            if(GameMedia.getThemeSound().getCurrentTime().equals(GameMedia.getThemeSound().getStopTime())) {
+                GameMedia.setThemeSoundToNull();
+            }
+        }
+        Entity bomberman = new Bomber(1, 1, Sprite.player_right.getFxImage(),
                     entities, walls, bomb,
                     explodes, bricks, buffs,
                     ballooms, oneAls);
@@ -117,6 +124,11 @@ public class BombermanGame extends Application {
                     }
                     if(isWin) {
                         Menu win = new Menu(3);
+                        GameMedia.getThemeSound().stop();
+                        if(play1timewinsound > 0) {
+                            GameMedia.getWinSound().play();
+                            play1timewinsound--;
+                        }
                         win.render(gc);
                         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
                             @Override
@@ -124,6 +136,8 @@ public class BombermanGame extends Application {
                                 switch (event.getCode()) {
                                     case R:
                                         clearAll(bomberman);
+                                        GameMedia.getWinSound().stop();
+                                        GameMedia.getRestartSound().play();
                                         replay = true;
                                         break;
                                     case ESCAPE:
@@ -143,6 +157,7 @@ public class BombermanGame extends Application {
                         }
                     } else if(isDone){
                         Menu lose = new Menu(2);
+                        GameMedia.getThemeSound().stop();
                         lose.render(gc);
                         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
                             @Override
@@ -151,6 +166,7 @@ public class BombermanGame extends Application {
                                     case R:
                                         clearAll(bomberman);
                                         replay = true;
+                                        GameMedia.getRestartSound().play();
                                         break;
                                     case ESCAPE:
                                         stage.close();
@@ -168,10 +184,16 @@ public class BombermanGame extends Application {
                     if(replay) {
                         if(test > 0) {
                             createMap();
+                            GameMedia.getThemeSound().play();
                             test--;
                         }
                         if(isWin) {
                             Menu win = new Menu(3);
+                            GameMedia.getThemeSound().stop();
+                            if(play1timewinsound > 0) {
+                                GameMedia.getWinSound().play();
+                                play1timewinsound--;
+                            }
                             win.render(gc);
                             scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
                                 @Override
@@ -179,6 +201,8 @@ public class BombermanGame extends Application {
                                     switch (event.getCode()) {
                                         case R:
                                             clearAll(bomberman);
+                                            GameMedia.getWinSound().stop();
+                                            GameMedia.getRestartSound().play();
                                             replay = true;
                                             break;
                                         case ESCAPE:
@@ -199,12 +223,14 @@ public class BombermanGame extends Application {
                         } else if(isDone) {
                             Menu lose = new Menu(2);
                             lose.render(gc);
+                            GameMedia.getThemeSound().stop();
                             scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
                                 @Override
                                 public void handle(KeyEvent event) {
                                     switch (event.getCode()) {
                                         case R:
                                             clearAll(bomberman);
+                                            GameMedia.getRestartSound().play();
                                             replay = true;
                                             break;
                                         case ESCAPE:
@@ -227,6 +253,7 @@ public class BombermanGame extends Application {
             }
         }
         test = 1;
+        play1timewinsound = 1;
         ballooms.clear();
         oneAls.clear();
         grass.clear();
@@ -241,7 +268,6 @@ public class BombermanGame extends Application {
         ((Bomber)bomberman).reset();
         isDone = false;
         isWin = false;
-        System.out.println("don map thanh cong");
     }
     public boolean stopUpdate() {
         return pauseStatus;
@@ -257,27 +283,54 @@ public class BombermanGame extends Application {
                             ((Bomber) bomberman).goDown = false;
                             ((Bomber) bomberman).goRight = false;
                             ((Bomber) bomberman).goLeft = false;
+                            soundWalk++;
+                            if(soundWalk==4) {
+                                GameMedia.setUpDownWalkSound();
+                                GameMedia.getUpDownWalkSound().play();
+                                soundWalk = 0;
+                            }
                             break;
                         case DOWN:
                             ((Bomber) bomberman).goDown = true;
                             ((Bomber) bomberman).goUp = false;
                             ((Bomber) bomberman).goRight = false;
                             ((Bomber) bomberman).goLeft = false;
+                            soundWalk++;
+                            if(soundWalk==4) {
+                                GameMedia.setUpDownWalkSound();
+                                GameMedia.getUpDownWalkSound().play();
+                                soundWalk = 0;
+                            }
                             break;
                         case RIGHT:
                             ((Bomber) bomberman).goRight = true;
                             ((Bomber) bomberman).goUp = false;
                             ((Bomber) bomberman).goDown = false;
                             ((Bomber) bomberman).goLeft = false;
+                            soundWalk++;
+                            if(soundWalk==4) {
+                                GameMedia.setLeftRightWalkSound();
+                                GameMedia.getLeftRightWalkSound().play();
+                                soundWalk = 0;
+                            }
+
                             break;
                         case LEFT:
                             ((Bomber) bomberman).goLeft = true;
                             ((Bomber) bomberman).goRight = false;
                             ((Bomber) bomberman).goDown = false;
                             ((Bomber) bomberman).goUp = false;
+                            soundWalk++;
+                            if(soundWalk==4) {
+                                GameMedia.setLeftRightWalkSound();
+                                GameMedia.getLeftRightWalkSound().play();
+                                soundWalk = 0;
+                            }
                             break;
                         case B:
                                 ((Bomber) bomberman).placeBomb();
+                                GameMedia.setPlaceBombSound();
+                                GameMedia.getPlaceBombSound().play();
                             break;
                         case P:
                             pauseStatus = true;

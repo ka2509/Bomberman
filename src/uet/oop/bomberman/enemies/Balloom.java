@@ -3,6 +3,7 @@ package uet.oop.bomberman.enemies;
 import javafx.scene.image.Image;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.graphics.Sprite;
+import uet.oop.bomberman.media.GameMedia;
 
 import java.util.List;
 
@@ -56,6 +57,11 @@ public class Balloom extends Enemy{
     @Override
     public void update() {
         if(!isAlive) {
+            if(oneDiesound > 0) {
+                GameMedia.setDeathSound();
+                GameMedia.getDeathSound().play();
+                oneDiesound--;
+            }
             if(die_animation == 40) {
                 img  = Sprite.hide.getFxImage();
                 x = 0; y = 0;

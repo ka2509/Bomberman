@@ -8,6 +8,7 @@ import uet.oop.bomberman.enemies.Enemy;
 import uet.oop.bomberman.enemies.oneAl;
 import uet.oop.bomberman.graphics.Sprite;
 import uet.oop.bomberman.graphics.SpriteSheet;
+import uet.oop.bomberman.media.GameMedia;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -59,6 +60,8 @@ public class Bomb  extends Entity{
     }
     public void explode() {
         BombermanGame.map[x/Sprite.SCALED_SIZE][y/Sprite.SCALED_SIZE] = 1;
+        GameMedia.setBombExplosionSound();
+        GameMedia.getBombExplosionSound().play();
         bombExploded = true;
         expLeft();
         expRight();

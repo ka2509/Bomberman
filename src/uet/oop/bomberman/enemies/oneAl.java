@@ -8,6 +8,7 @@ import uet.oop.bomberman.entities.Bomber;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.graphics.Sprite;
 import uet.oop.bomberman.ai.*;
+import uet.oop.bomberman.media.GameMedia;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,9 +105,7 @@ public class oneAl extends Enemy {
                 double nextX = pFinder.pathList.get(0).col * Sprite.SCALED_SIZE;
                 double nextY = pFinder.pathList.get(0).row * Sprite.SCALED_SIZE;
                 double enLeftX = (x - 16);
-                double enRightX = (x + 16);
                 double enTopY = (y - 16);
-                double enBotY = (y + 16);
                 if(enTopY > nextY - 16 && enLeftX == nextX - 16) {
                     dir = 1;
                 } else if(enTopY < nextY - 16 && enLeftX == nextX - 16) {
@@ -119,40 +118,10 @@ public class oneAl extends Enemy {
                     if(enLeftX <  nextX - 16) {
                         dir = 0;
                     }
-                } //else if (enTopY > nextY - 16 && enLeftX > nextX - 16) {
-//                    //left or up
-//                    dir = 1;
-//                    if( imPassable(x,y+speed)) {
-//                        //dir = 2;
-//                        x-=speed;
-//                    }
-//                } else if (enTopY > nextY - 16 && enLeftX < nextX - 16) {
-//                    //right or up
-//                    dir =1;
-//                    if( imPassable(x,y+speed)) {
-//                        //dir =0;
-//                        x+=speed;
-//                    }
-//                } else if (enTopY < nextY - 16 && enLeftX > nextX - 16) {
-//                    //left or down
-//                    dir = 3;
-//                    if( imPassable(x,y-speed)) {
-//                        //dir =2;
-//                        x-=speed;
-//                    }
-//                } else if (enTopY < nextY - 16 && enLeftX < nextX - 16) {
-//                    dir = 3;
-//                    if( imPassable(x,y-speed)) {
-//                        //dir =0;
-//                        x+=speed;
-//                    }
-//                }
+                }
                 int nextCol = pFinder.pathList.get(0).col ;
                 int nextRow = pFinder.pathList.get(0).row ;
-//                    System.out.println(nextCol);
-//                    System.out.println(nextRow);
                 if(nextCol == goalCol && nextRow == goalRow) {
-                    System.out.println("gap nhau");
                     onPath = false;
                     count++;
                 }
@@ -198,6 +167,11 @@ public class oneAl extends Enemy {
     @Override
     public void update() {
         if(!isAlive) {
+            if(oneDiesound > 0) {
+                GameMedia.setDeathSound();
+                GameMedia.getDeathSound().play();
+                oneDiesound--;
+            }
             if(die_animation == 40) {
                 img  = Sprite.hide.getFxImage();
                 x = 0; y = 0;

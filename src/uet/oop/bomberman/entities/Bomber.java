@@ -1,19 +1,13 @@
 package uet.oop.bomberman.entities;
+
 import javafx.application.Platform;
-import javafx.scene.paint.ImagePattern;
-import uet.oop.bomberman.enemies.Balloom;
+import javafx.scene.image.Image;
+
 import uet.oop.bomberman.enemies.Enemy;
 import uet.oop.bomberman.graphics.Sprite;
 import uet.oop.bomberman.BombermanGame;
+import uet.oop.bomberman.media.GameMedia;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.paint.Color;
-
-import javax.swing.*;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +31,7 @@ public class Bomber extends Entity {
     private List<Entity> buffs;
     private List<Enemy> ballooms;
     private List<Enemy> oneAls;
+    private int oneDiesound;
     public Bomber(int x, int y, Image img, List<Entity> entities,
                   List<Entity> walls, List<Entity> bombs,
                   List<Entity> explodes, List<Entity> bricks,
@@ -57,6 +52,7 @@ public class Bomber extends Entity {
         hasFlame = false;
         hasBombs = false;
         canActiveBomb2 = false;
+        oneDiesound = 1;
     }
     public Bomber(){}
     public void reset() {
@@ -70,6 +66,7 @@ public class Bomber extends Entity {
         canActiveBomb2 = false;
         animated = 0;
         die_animation = 0;
+        oneDiesound = 1;
     }
 
     public void standUp() {
@@ -183,6 +180,8 @@ public void checkBuff() {
          Entity p = buffs.get(i);
             if(this.x - 10 <= p.getX() + 10 && this.x +10 >= p.getX() -10) {
             if(this.y +16 >= p.getY() - 10 && this.y -16 <= p.getY() +10) {
+                GameMedia.setGetPowerUpSound();
+                GameMedia.getGetPowerUpSound().play();
                 switch (i) {
                     case 0 :
                         if(hasFlame == false) {
@@ -313,6 +312,11 @@ public void checkBuff() {
            @Override
     public void update() {
                if(!isAlive()) {
+                   if(oneDiesound > 0) {
+                       GameMedia.setGameOverSound();
+                       GameMedia.getGameOverSound().play();
+                       oneDiesound--;
+                   }
                    if( die_animation == 200) {
                        x= 0; y=0;
                        img = Sprite.hide.getFxImage();

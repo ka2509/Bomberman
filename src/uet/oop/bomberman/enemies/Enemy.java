@@ -13,6 +13,7 @@ import java.util.Random;
 
 public abstract class Enemy {
     //toa do hinh anh
+    protected int oneDiesound;
     protected double x;
     protected double y;
     protected Image img;
@@ -39,6 +40,7 @@ public abstract class Enemy {
         animated = 0;
         die_animation = 0;
         isAlive = true;
+        oneDiesound =1;
     }
     public abstract void update();
     public void setKilled() {
