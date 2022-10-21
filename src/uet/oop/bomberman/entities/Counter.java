@@ -11,7 +11,7 @@ public class Counter extends Entity{
     private int count = 0;
     private int number = 9;
     private int number1 = 9;
-    private int number3 = 1;
+    private int number3 = 2;
     private List<Entity> timer;
 
     public Counter(int xUnit, int yUnit, Image img, List<Entity> timer) {
@@ -23,14 +23,14 @@ public class Counter extends Entity{
         count =0;
         number = 9;
         number1 =9;
-        number3 =1;
-        img  = Sprite.two.getFxImage();
+        number3 =2;
+        img  = Sprite.three.getFxImage();
     }
 public void resetB() {
     count =0;
     number = 9;
     number1 =9;
-    number3 =1;
+    number3 =2;
     img  = Sprite.zero.getFxImage();
 }
     @Override

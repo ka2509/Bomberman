@@ -305,7 +305,7 @@ public void checkBuff() {
         if(((Portal)BombermanGame.portal).opened == true) {
             if (BombermanGame.portal.getX() - 15 < x + 10 && BombermanGame.portal.getX() + 15 > x - 10) {
                 if (BombermanGame.portal.getY() + 15 > y - 16 && BombermanGame.portal.getY() - 15 < y + 16) {
-                    BombermanGame.isDone = true;
+                    BombermanGame.isWin = true;
                 }
             }
         }

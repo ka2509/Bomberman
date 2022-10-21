@@ -11,9 +11,11 @@ public class Menu {
     private String menuFileName = new File("res/textures/Bomberman_Game.png").toURI().toString();
     private String pauseFileName = new File("res/textures/Pause.png").toURI().toString();
     private String loseFileName = new File("res/textures/lose.png").toURI().toString();
+    private String winFileName = new  File("res/textures/win.png").toURI().toString();
     private Image menu = new Image(menuFileName);
     private Image pause = new Image(pauseFileName);
     private Image lose = new Image(loseFileName);
+    private Image win = new Image(winFileName);
     public Menu(int type) {
         if(type == 0) {
             this.img = menu;
@@ -23,6 +25,9 @@ public class Menu {
         }
         else if(type == 2) {
             this.img = lose;
+        }
+        else if(type == 3) {
+            this.img = win;
         }
     }
     public void render(GraphicsContext gc) {

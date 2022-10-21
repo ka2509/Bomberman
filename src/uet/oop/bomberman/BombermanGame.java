@@ -44,6 +44,7 @@ public class BombermanGame extends Application {
         Application.launch(BombermanGame.class);
     }
     public static boolean isDone = false;
+    public static boolean isWin = false;
     private boolean pauseStatus = false;
    public static boolean replay = false;
    public int test = 1;
@@ -98,7 +99,7 @@ public class BombermanGame extends Application {
                     explodes, bricks, buffs,
                     ballooms, oneAls);
             entities.add(bomberman);
-            Entity aTime = new Counter(0, 0, Sprite.two.getFxImage(), timer);
+            Entity aTime = new Counter(0, 0, Sprite.three.getFxImage(), timer);
             Entity bTime = new Counter(1, 0, Sprite.zero.getFxImage(), timer);
             Entity cTime = new Counter(2, 0, Sprite.zero.getFxImage(), timer);
             timer.add(aTime);
@@ -114,16 +115,33 @@ public class BombermanGame extends Application {
                         createMap();
                         test--;
                     }
-                    if (!isDone) {
+                    if(isWin) {
+                        Menu win = new Menu(3);
+                        win.render(gc);
+                        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                            @Override
+                            public void handle(KeyEvent event) {
+                                switch (event.getCode()) {
+                                    case R:
+                                        clearAll(bomberman);
+                                        replay = true;
+                                        break;
+                                    case ESCAPE:
+                                        stage.close();
+                                        break;
+                                }
+                            }
+                        });
+                    }
+                    else if (!isDone) {
                         if (!stopUpdate()) {
-                            System.out.println("continue");
                             update();
                             render();
                             if (((Bomber) bomberman).isAlive()) {
                                 initscene(scene, bomberman, stage);
                             }
                         }
-                    } else {
+                    } else if(isDone){
                         Menu lose = new Menu(2);
                         lose.render(gc);
                         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -152,16 +170,33 @@ public class BombermanGame extends Application {
                             createMap();
                             test--;
                         }
-                        if (!isDone) {
+                        if(isWin) {
+                            Menu win = new Menu(3);
+                            win.render(gc);
+                            scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                                @Override
+                                public void handle(KeyEvent event) {
+                                    switch (event.getCode()) {
+                                        case R:
+                                            clearAll(bomberman);
+                                            replay = true;
+                                            break;
+                                        case ESCAPE:
+                                            stage.close();
+                                            break;
+                                    }
+                                }
+                            });
+                        }
+                        else if (!isDone) {
                             if (!stopUpdate()) {
-                                System.out.println("continue123");
                                 update();
                                 render();
                                 if (((Bomber) bomberman).isAlive()) {
                                     initscene(scene, bomberman, stage);
                                 }
                             }
-                        } else {
+                        } else if(isDone) {
                             Menu lose = new Menu(2);
                             lose.render(gc);
                             scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -205,6 +240,7 @@ public class BombermanGame extends Application {
         ((Counter)timer.get(2)).resetB();
         ((Bomber)bomberman).reset();
         isDone = false;
+        isWin = false;
         System.out.println("don map thanh cong");
     }
     public boolean stopUpdate() {

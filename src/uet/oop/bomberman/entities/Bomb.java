@@ -211,7 +211,7 @@ public class Bomb  extends Entity{
                 if (x - 10 >= rightX - 16 && x + 10 <= rightX + 36) {
                     if (y + 16 >= rightY - 10 && y - 16 <= rightY + 10) {
                         ((Brick) p).destroy();
-                        BombermanGame.map[x][y] = 1;
+                        BombermanGame.map[x/32][y/32] = 1;
                     }
                 }
             }
