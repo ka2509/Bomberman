@@ -29,14 +29,14 @@ public class Bomber extends Entity {
    private int animated ;
     private boolean hasActiveBomb;
     private boolean canActiveBomb2;
-    private List<Entity> entities = new ArrayList<>();
-    private List<Entity> walls = new ArrayList<>();
-    private List<Entity> bombs = new ArrayList<>();
-    private List<Entity> bricks= new ArrayList<>();
-    private List<Entity> explodes = new ArrayList<>();
-    private List<Entity> buffs = new ArrayList<>();
-    private List<Enemy> ballooms = new ArrayList<>();
-    private List<Enemy> oneAls = new ArrayList<>();
+    private List<Entity> entities;
+    private List<Entity> walls;
+    private List<Entity> bombs;
+    private List<Entity> bricks;
+    private List<Entity> explodes;
+    private List<Entity> buffs;
+    private List<Enemy> ballooms;
+    private List<Enemy> oneAls;
     public Bomber(int x, int y, Image img, List<Entity> entities,
                   List<Entity> walls, List<Entity> bombs,
                   List<Entity> explodes, List<Entity> bricks,
@@ -57,8 +57,22 @@ public class Bomber extends Entity {
         hasFlame = false;
         hasBombs = false;
         canActiveBomb2 = false;
-    } 
-   public void standUp() {
+    }
+    public Bomber(){}
+    public void reset() {
+        x = 32;
+        y = 32;
+        img  = Sprite.player_right.getFxImage();
+        hasActiveBomb = false;
+        isAlive = true;
+        hasFlame = false;
+        hasBombs = false;
+        canActiveBomb2 = false;
+        animated = 0;
+        die_animation = 0;
+    }
+
+    public void standUp() {
       img = Sprite.player_up.getFxImage();
    }
    public void standRight() {
@@ -251,26 +265,29 @@ public void checkBuff() {
             int dieY = p.getY();
             if(dieX == 0 && dieY == 0) {
                 brick.add(p);
-                BombermanGame.map[dieX/Sprite.SCALED_SIZE][dieY/Sprite.SCALED_SIZE] = 1;
             }
         }
         bricks.removeAll(brick);
         List<Enemy>balloom = new ArrayList<>();
         for(Enemy p : ballooms) {
-            if(p.getX() == 0 && p.getY() == 0) {
+            double dieX = p.getX();
+            double dieY = p.getY();
+            if(dieX == 0 && dieY == 0) {
                 balloom.add(p);
             }
         }
         ballooms.removeAll(balloom);
         List<Enemy>oneAl = new ArrayList<>();
         for(Enemy p : oneAl) {
-            if(p.getX() == 0 && p.getY() == 0) {
+            double dieX = p.getX();
+            double dieY = p.getY();
+            if(dieX == 0 && dieY == 0) {
                 oneAl.add(p);
             }
         }
         oneAls.removeAll(oneAl);
     }
-    private void handleKill() {
+    private void handleStatus() {
         for(Enemy p : ballooms) {
             if (p.getX() - 16 < x +10 && p.getX() + 16 > x - 10) {
                 if (p.getY() + 16 > y - 16 && p.getY() - 16 < y + 16) {
@@ -285,59 +302,80 @@ public void checkBuff() {
                 }
             }
         }
+        if(((Portal)BombermanGame.portal).opened == true) {
+            if (BombermanGame.portal.getX() - 15 < x + 10 && BombermanGame.portal.getX() + 15 > x - 10) {
+                if (BombermanGame.portal.getY() + 15 > y - 16 && BombermanGame.portal.getY() - 15 < y + 16) {
+                    BombermanGame.isDone = true;
+                }
+            }
+        }
     }
            @Override
     public void update() {
-               handleKill();
-        if(goUp) {
-            img = Sprite.movingSprite(Sprite.player_up,Sprite.player_up_1, Sprite.player_up_2, animated++, 40).getFxImage();
-            if(!imPassable(x, y-1)) {
-                y -=1;
-               // checkBuff();
-            }
+               if(!isAlive()) {
+                   if( die_animation == 200) {
+                       x= 0; y=0;
+                       img = Sprite.hide.getFxImage();
+                       BombermanGame.isDone = true;
+                       return;
+                   }
+                   img = Sprite.movingSprite(Sprite.player_dead1, Sprite.player_dead2, Sprite.player_dead3, die_animation++, 400).getFxImage();
+                   die_animation++;
+               }
+               else {
+                   handleStatus();
+                   if(goUp) {
+                       img = Sprite.movingSprite(Sprite.player_up,Sprite.player_up_1, Sprite.player_up_2, animated++, 40).getFxImage();
+                       if(!imPassable(x, y-1)) {
+                           y -=1;
+                           // checkBuff();
+                       }
 //             System.out.println("Up:" + x);
 //             System.out.println(y);
-         }
-         if(goRight) {
-            img = Sprite.movingSprite(Sprite.player_right,Sprite.player_right_1, Sprite.player_right_2, animated++, 40).getFxImage();
-            if(!imPassable(x+1,y)) {
-                 x += 1;
-                //x += 1;
-                //checkBuff();
-            }
+                   }
+                   if(goRight) {
+                       img = Sprite.movingSprite(Sprite.player_right,Sprite.player_right_1, Sprite.player_right_2, animated++, 40).getFxImage();
+                       if(!imPassable(x+1,y)) {
+                           x += 1;
+                           //x += 1;
+                           //checkBuff();
+                       }
 //             System.out.println("Right:" + x);
 //             System.out.println(y);
-         }
-         if(goLeft) {
-            img = Sprite.movingSprite(Sprite.player_left,Sprite.player_left_1, Sprite.player_left_2, animated++, 40).getFxImage();
-            if(!imPassable(x-1,y)) {
-                x -=1;
-                //checkBuff();
-            }
+                   }
+                   if(goLeft) {
+                       img = Sprite.movingSprite(Sprite.player_left,Sprite.player_left_1, Sprite.player_left_2, animated++, 40).getFxImage();
+                       if(!imPassable(x-1,y)) {
+                           x -=1;
+                           //checkBuff();
+                       }
 //             System.out.println("Left:" + x);
 //             System.out.println(y);
-         }
-         if(goDown) {
-            img = Sprite.movingSprite(Sprite.player_down,Sprite.player_down_1, Sprite.player_down_2, animated++,40).getFxImage();
-            if(!imPassable(x,y+1)) {
-                y += 1;
-                //checkBuff();
-            }
+                   }
+                   if(goDown) {
+                       img = Sprite.movingSprite(Sprite.player_down,Sprite.player_down_1, Sprite.player_down_2, animated++,40).getFxImage();
+                       if(!imPassable(x,y+1)) {
+                           y += 1;
+                           //checkBuff();
+                       }
 //             System.out.println("Down" + x);
 //             System.out.println(y);
-         }
-         if(!buffs.isEmpty()) {
-             checkBuff();
-         }
-         if(!isAlive()) {
-            if( die_animation == 200) {
-                x= 0; y=0;
-                img = Sprite.hide.getFxImage();
-                return;
-            }
-             img = Sprite.movingSprite(Sprite.player_dead1, Sprite.player_dead2, Sprite.player_dead3, die_animation++, 400).getFxImage();
-            die_animation++;
-         }
+                   }
+                   if(!buffs.isEmpty()) {
+                       checkBuff();
+                   }
+                   if(!isAlive()) {
+                       if( die_animation == 200) {
+                           x= 0; y=0;
+                           img = Sprite.hide.getFxImage();
+                           BombermanGame.isDone = true;
+                           return;
+                       }
+                       img = Sprite.movingSprite(Sprite.player_dead1, Sprite.player_dead2, Sprite.player_dead3, die_animation++, 400).getFxImage();
+                       die_animation++;
+                   }
+               }
+
          clearDeadEntity();
     };   
     }

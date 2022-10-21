@@ -22,9 +22,9 @@ public abstract class Enemy {
     protected int animated;
     protected int die_animation;
     protected boolean isAlive;
-    private List<Entity> bricks= new ArrayList<>();
-    private List<Entity> walls = new ArrayList<>();
-    private List<Entity> bomb = new ArrayList<>();
+    private List<Entity> bricks;
+    private List<Entity> walls;
+    private List<Entity> bomb;
     public Enemy(int xUnit, int yUnit,Image img,
                  List<Entity> bricks,
                  List<Entity> walls,

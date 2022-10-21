@@ -29,7 +29,9 @@ public  Entity() {
         gc.drawImage(img, x, y);
     }
     public abstract void update();
-    
+    public void setImg(Image img) {
+        this.img =img;
+    }
     public int getX() {
         return x;
     }

@@ -18,8 +18,8 @@ public class oneAl extends Enemy {
     private int test = 1;
     private int count = 0;
     private boolean onPath;
-    private List<Entity> entities = new ArrayList<>();
-    private PathFinder pFinder = new PathFinder();
+    private List<Entity> entities;
+    private PathFinder pFinder;
     public oneAl(int xUnit, int yUnit, Image img,
                  List<Entity> bricks,
                  List<Entity> walls,

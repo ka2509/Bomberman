@@ -29,7 +29,22 @@ public class Sprite {
 	public static Sprite brick = new Sprite(DEFAULT_SIZE, 7, 0, SpriteSheet.tiles, 16, 16);
 	public static Sprite wall = new Sprite(DEFAULT_SIZE, 5, 0, SpriteSheet.tiles, 16, 16);
 	public static Sprite portal = new Sprite(DEFAULT_SIZE, 4, 0, SpriteSheet.tiles, 14, 14);
-	
+	/*
+	|--------------------------------------------------------------------------
+	| Number
+	|--------------------------------------------------------------------------
+	 */
+	public static Sprite zero = new Sprite(DEFAULT_SIZE, 8, 10, SpriteSheet.tiles, 15, 15);
+	public static Sprite one = new Sprite(DEFAULT_SIZE, 9, 10, SpriteSheet.tiles, 15, 15);
+	public static Sprite two = new Sprite(DEFAULT_SIZE, 10, 10, SpriteSheet.tiles, 15, 15);
+	public static Sprite three = new Sprite(DEFAULT_SIZE, 11, 10, SpriteSheet.tiles, 15, 15);
+	public static Sprite four = new Sprite(DEFAULT_SIZE, 12, 10, SpriteSheet.tiles, 15, 15);
+	public static Sprite five = new Sprite(DEFAULT_SIZE, 8, 11, SpriteSheet.tiles, 15, 15);
+	public static Sprite six = new Sprite(DEFAULT_SIZE, 9, 11, SpriteSheet.tiles, 15, 15);
+	public static Sprite seven = new Sprite(DEFAULT_SIZE, 10, 11, SpriteSheet.tiles, 15, 15);
+	public static Sprite eight = new Sprite(DEFAULT_SIZE, 11, 11, SpriteSheet.tiles, 15, 15);
+	public static Sprite nine = new Sprite(DEFAULT_SIZE, 12, 11, SpriteSheet.tiles, 15, 15);
+	public static final Sprite[] numbersArray = {zero,one,two,three,four,five,six,seven,eight,nine};
 	/*
 	|--------------------------------------------------------------------------
 	| Bomber Sprites

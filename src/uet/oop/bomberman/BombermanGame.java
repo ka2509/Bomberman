@@ -2,6 +2,7 @@ package uet.oop.bomberman;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -11,7 +12,6 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
@@ -28,20 +28,25 @@ public class BombermanGame extends Application {
     public static int[][] map = new int[WIDTH][HEIGHT];
     private GraphicsContext gc;
     private Canvas canvas;
-    private PathFinder pFinder = new PathFinder();
-    private List<Entity> entities = new ArrayList<>();
-    private List<Entity> grass = new ArrayList<>();
-    private List<Entity> walls = new ArrayList<>();
+    public static PathFinder pFinder = new PathFinder();
+    public static List<Entity> entities = new ArrayList<>();
+    public static List<Entity> grass = new ArrayList<>();
+    public static List<Entity> walls = new ArrayList<>();
     public static List<Entity> bomb = new ArrayList<>();
-    private List<Entity> explodes = new ArrayList<>();
+    public static List<Entity> explodes = new ArrayList<>();
     public static List<Entity> bricks = new ArrayList<>();
     private List<Entity> buffs = new ArrayList<>();
-    private List<Enemy> ballooms = new ArrayList<>();
-    private List<Enemy> oneAls = new ArrayList<>();
+    public static List<Enemy> ballooms = new ArrayList<>();
+    public static List<Enemy> oneAls = new ArrayList<>();
+    public static List<Entity> timer = new ArrayList<>();
+    public static Entity portal = new Portal();
     public static void main(String[] args) {
         Application.launch(BombermanGame.class);
     }
-
+    public static boolean isDone = false;
+    private boolean pauseStatus = false;
+   public static boolean replay = false;
+   public int test = 1;
     @Override
     public void start(Stage stage) {
         // Tao Canvas
@@ -52,34 +57,160 @@ public class BombermanGame extends Application {
         Group root = new Group();
         root.getChildren().add(canvas);
 
+        // Tao menu
+        Menu menu = new Menu(0);
+
         // Tao scene
         Scene scene = new Scene(root);
 
         // Them scene vao stage
         stage.setScene(scene);
         stage.show();
-        createMap();
-
-        Entity bomberman = new Bomber(1, 1, Sprite.player_right.getFxImage(),
-                entities, walls, bomb,
-                explodes, bricks, buffs,
-                ballooms, oneAls);
-        entities.add(bomberman);
-        AnimationTimer timer = new AnimationTimer() {
-            @Override
-            public void handle(long l) {
-                update();
-                render();
-                if(((Bomber)bomberman).isAlive()) {initscene(scene, bomberman);}
-                if(checkWin()) {
-                    System.out.println("end game");
+        //createMap();
+//        Entity bomberman = new Bomber(1, 1, Sprite.player_right.getFxImage(),
+//                entities, walls, bomb,
+//                explodes, bricks, buffs,
+//                ballooms, oneAls);
+//        entities.add(bomberman);
+//        Entity aTime = new Counter(0, 0, Sprite.two.getFxImage(), timer);
+//        Entity bTime = new Counter(1, 0, Sprite.zero.getFxImage(), timer);
+//        Entity cTime = new Counter(2, 0, Sprite.zero.getFxImage(), timer);
+//        timer.add(aTime);
+//        timer.add(bTime);
+//        timer.add(cTime);
+        menu.render(gc);
+            scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent event) {
+                    switch (event.getCode()) {
+                        case ENTER:
+                            handleGamePlay(/*bomberman,*/scene,stage);
+                            break;
+                        case ESCAPE:
+                            stage.close();
+                    }
                 }
-            }
-        };
-        timer.start();
+            });
+    }
+    public void handleGamePlay(Scene scene, Stage stage) {
+            Entity bomberman = new Bomber(1, 1, Sprite.player_right.getFxImage(),
+                    entities, walls, bomb,
+                    explodes, bricks, buffs,
+                    ballooms, oneAls);
+            entities.add(bomberman);
+            Entity aTime = new Counter(0, 0, Sprite.two.getFxImage(), timer);
+            Entity bTime = new Counter(1, 0, Sprite.zero.getFxImage(), timer);
+            Entity cTime = new Counter(2, 0, Sprite.zero.getFxImage(), timer);
+            timer.add(aTime);
+            timer.add(bTime);
+            timer.add(cTime);
+            AnimationTimer timer1 = new AnimationTimer() {
+                @Override
+                public void handle(long l) {
+                    if(replay) {
+                        this.stop();
+                    }
+                    else if(test >0){
+                        createMap();
+                        test--;
+                    }
+                    if (!isDone) {
+                        if (!stopUpdate()) {
+                            System.out.println("continue");
+                            update();
+                            render();
+                            if (((Bomber) bomberman).isAlive()) {
+                                initscene(scene, bomberman, stage);
+                            }
+                        }
+                    } else {
+                        Menu lose = new Menu(2);
+                        lose.render(gc);
+                        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                            @Override
+                            public void handle(KeyEvent event) {
+                                switch (event.getCode()) {
+                                    case R:
+                                        clearAll(bomberman);
+                                        replay = true;
+                                        break;
+                                    case ESCAPE:
+                                        stage.close();
+                                        break;
+                                }
+                            }
+                        });
+                    }
+                }
+            };
+            timer1.start();
+            AnimationTimer timer2 = new AnimationTimer() {
+                @Override
+                public void handle(long now) {
+                    if(replay) {
+                        if(test > 0) {
+                            createMap();
+                            test--;
+                        }
+                        if (!isDone) {
+                            if (!stopUpdate()) {
+                                System.out.println("continue123");
+                                update();
+                                render();
+                                if (((Bomber) bomberman).isAlive()) {
+                                    initscene(scene, bomberman, stage);
+                                }
+                            }
+                        } else {
+                            Menu lose = new Menu(2);
+                            lose.render(gc);
+                            scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                                @Override
+                                public void handle(KeyEvent event) {
+                                    switch (event.getCode()) {
+                                        case R:
+                                            clearAll(bomberman);
+                                            replay = true;
+                                            break;
+                                        case ESCAPE:
+                                            stage.close();
+                                            break;
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            };
+            timer2.start();
     }
 
-    public void initscene(Scene scene, Entity bomberman) {
+    public void clearAll(Entity bomberman) {
+        for(int i =0; i< WIDTH; i++) {
+            for(int j=0;j<HEIGHT;j++) {
+                map[i][j] = 10;
+            }
+        }
+        test = 1;
+        ballooms.clear();
+        oneAls.clear();
+        grass.clear();
+        walls.clear();
+        bomb.clear();
+        explodes.clear();
+        bricks.clear();
+        buffs.clear();
+        ((Counter)timer.get(0)).resetA();
+        ((Counter)timer.get(1)).resetB();
+        ((Counter)timer.get(2)).resetB();
+        ((Bomber)bomberman).reset();
+        isDone = false;
+        System.out.println("don map thanh cong");
+    }
+    public boolean stopUpdate() {
+        return pauseStatus;
+    }
+    public void initscene(Scene scene, Entity bomberman, Stage stage) {
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -112,14 +243,23 @@ public class BombermanGame extends Application {
                         case B:
                                 ((Bomber) bomberman).placeBomb();
                             break;
+                        case P:
+                            pauseStatus = true;
+                            Menu pause = new Menu(1);
+                            pause.render(gc);
+                            break;
+                        case R:
+                            if(pauseStatus == true) {
+                                pauseStatus = false;
+                            }
+                            break;
+//                        case ESCAPE:
+//                            stage.close();
                     }
                 }
             }
         });
-         scene.setOnKeyReleased(new EventHandler<KeyEvent>()
-
-    {
-        @Override
+         scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
         public void handle (KeyEvent event){
         switch (event.getCode()) {
             case UP:
@@ -174,8 +314,8 @@ public class BombermanGame extends Application {
                      }
                 }
             }
-            for(int i = 4; i < WIDTH - 1; i++) {
-                for(int j = 4; j < HEIGHT - 1; j++) {
+            for(int i = 4; i < WIDTH - 2; i++) {
+                for(int j = 4; j < HEIGHT - 2; j++) {
                     if(map[i][j] == 1 && (int) Math.floor(Math.random() * 100 + 1) <= 25) {
                         if(ballooms.size() < 5) {
                             ballooms.add(new Balloom(i, j, Sprite.balloom_right1.getFxImage(), bricks, walls, bomb));
@@ -192,38 +332,37 @@ public class BombermanGame extends Application {
             }
         Entity tmp1 = bricks.get((int) Math.floor(Math.random() * (bricks.size())));
         Entity tmp2 = bricks.get((int) Math.floor(Math.random() * (bricks.size())));
+        Entity tmp3 = bricks.get((int) Math.floor(Math.random() * (bricks.size())));
         Entity powerup_flames = new Buff(tmp1.getX()/32, tmp1.getY()/32, Sprite.powerup_flames.getFxImage());
         Entity powerup_bombs = new Buff(tmp2.getX()/32, tmp2.getY()/32, Sprite.powerup_bombs.getFxImage());
+        portal.setX(tmp3.getX());
+        portal.setY(tmp3.getY());
+        portal.setImg(Sprite.portal.getFxImage());
         buffs.add(powerup_flames);
         buffs.add(powerup_bombs);
+        System.out.println(portal.getX());
+        System.out.println(portal.getY());
         System.out.println(powerup_flames.getX());
         System.out.println(powerup_flames.getY());
         System.out.println(powerup_bombs.getX());
         System.out.println(powerup_bombs.getY());
     }
-    public boolean checkWin() {
-        if(ballooms.isEmpty()) {
-            return true;
-        }
-        return false;
-    }
 
     public void update() {
-        if(!entities.isEmpty()) {
-            entities.forEach(Entity::update);
-        }
-        if(!bomb.isEmpty()) {
-            bomb.forEach(Entity::update);
-        }
+        entities.forEach(Entity::update);
+        bomb.forEach(Entity::update);
         bricks.forEach(Entity::update);
         ballooms.forEach(Enemy::update);
         oneAls.forEach(Enemy::update);
+        timer.forEach(Entity::update);
+        portal.update();
     }
 
     public void render() {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         grass.forEach(g -> g.render(gc));
         buffs.forEach(g -> g.render(gc));
+        portal.render(gc);
         walls.forEach(g -> g.render(gc));
         bricks.forEach(g -> g.render(gc));
         entities.forEach(g -> g.render(gc));
@@ -231,5 +370,6 @@ public class BombermanGame extends Application {
         explodes.forEach(g -> g.render(gc));
         ballooms.forEach(g -> g.render(gc));
         oneAls.forEach(g -> g.render(gc));
+        timer.forEach(g -> g.render(gc));
     }
 }

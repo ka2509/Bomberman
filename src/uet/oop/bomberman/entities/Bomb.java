@@ -17,14 +17,13 @@ public class Bomb  extends Entity{
     private int animated;
     private boolean setBomb = false;
     private boolean bombExploded =false;
-    private List<Entity> entities = new ArrayList<>();
-    private List<Entity> walls = new ArrayList<>();
-    private List<Entity> bombs = new ArrayList<>();
-    private List<Entity> explodes = new ArrayList<>();
-    private List<Entity> bricks= new ArrayList<>();
-    private List<Enemy> ballooms = new ArrayList<>();
-    private List<Enemy> oneAls = new ArrayList<>();
-    private int bombCount = 0;
+    private List<Entity> entities;
+    private List<Entity> walls;
+    private List<Entity> bombs;
+    private List<Entity> explodes;
+    private List<Entity> bricks;
+    private List<Enemy> ballooms;
+    private List<Enemy> oneAls;
     private int radius;
     public Bomb(int radius, List<Entity> entities,
                 List<Entity> walls,List<Entity> bombs,
@@ -66,23 +65,38 @@ public class Bomb  extends Entity{
         expUp();
         expDown();
         for (Entity p : entities) {
-            if (p.getX() - 10 <= x +16 && p.getX() + 10 >= x - 16) {
-                if (p.getY() + 16 >= y - 10 && p.getY() - 16 <= y + 10) {
+            int x = p.getX();
+            int y = p.getY();
+            if (x - 10 <= this.x +16 && x + 10 >= this.x - 16) {
+                if (y + 16 >= this.y - 10 && y - 16 <= this.y + 10) {
                     ((Bomber) p).setKilled();
                 }
             }
         }
         for (Enemy p : ballooms) {
-            if (p.getX() - 16 <= x +16 && p.getX() + 16 >= x - 16) {
-                if (p.getY() + 16 >= y - 10 && p.getY() - 16 <= y + 10) {
+            double x = p.getX();
+            double y = p.getY();
+            if (x - 16 <= this.x +16 && x + 16 >= this.x - 16) {
+                if (y + 16 >= this.y - 10 && y - 16 <= this.y + 10) {
                      p.setKilled();
                 }
             }
         }
         for (Enemy p : oneAls) {
-            if (p.getX() - 16 <= x +16 && p.getX() + 16 >= x - 16) {
-                if (p.getY() + 16 >= y - 10 && p.getY() - 16 <= y + 10) {
+            double x = p.getX();
+            double y = p.getY();
+            if (x - 16 <= this.x +16 && x + 16 >= this.x - 16) {
+                if (y + 16 >= this.y - 10 && y - 16 <= this.y + 10) {
                     p.setKilled();
+                }
+            }
+        }
+        if(((Portal) BombermanGame.portal).covered() == false) {
+            int x = BombermanGame.portal.getX();
+            int y = BombermanGame.portal.getY();
+            if (x - 15 <= this.x +16 && x + 15 >= this.x - 16) {
+                if (y + 15 >= this.y - 10 && y - 15 <= this.y + 10) {
+                    ((Portal) BombermanGame.portal).exploded = true;
                 }
             }
         }
@@ -91,6 +105,8 @@ public class Bomb  extends Entity{
     public void expLeft() {
         for(int i = 1 ; i<=radius; i++) {
             Entity left  = new tmpObject(x/Sprite.SCALED_SIZE-i, y/Sprite.SCALED_SIZE, Sprite.explosion_horizontal.getFxImage());
+            int leftX = left.getX();
+            int leftY = left.getY();
             if(validBlock(x-32,y)) {
                 if(validBlock(x-32*i,y)) {
                     explodes.add(left);
@@ -98,39 +114,60 @@ public class Bomb  extends Entity{
             }
             else {
                 for (Entity p : bricks) {
-                    if (p.getX() - 10 >= left.getX() - 36 && p.getX() + 10 <= left.getX() + 48) {
-                        if (p.getY() + 16 >= left.getY() - 10 && p.getY() - 16 <= left.getY() + 10) {
+                    int x = p.getX();
+                    int y = p.getY();
+                    if (x - 10 >= leftX - 36 && x + 10 <= leftX + 48) {
+                        if (y + 16 >= leftY - 10 && y - 16 <= leftY + 10) {
                             ((Brick) p).destroy();
+                            BombermanGame.map[x/32][y/32] = 1;
                         }
                     }
                 }
                 return;
             }
                 for (Entity p : entities) {
-                    if (p.getX() - 10 <= left.getX() +16 && p.getX() + 10 >= left.getX() - 16) {
-                        if (p.getY() + 16 >= left.getY() - 10 && p.getY() - 16 <= left.getY() + 10) {
+                    int x = p.getX();
+                    int y = p.getY();
+                    if (x - 10 <= leftX +16 && p.getX() + 10 >= leftX - 16) {
+                        if (y + 16 >= leftY - 10 && y - 16 <= leftY + 10) {
                             ((Bomber) p).setKilled();
                         }
                     }
                 }
             for (Entity p : bricks) {
-                if (p.getX() - 10 >= left.getX() - 36 && p.getX() + 10 <= left.getX() + 48) {
-                    if (p.getY() + 16 >= left.getY() - 10 && p.getY() - 16 <= left.getY() + 10) {
+                int x = p.getX();
+                int y = p.getY();
+                if (x - 10 >= leftX - 36 && x + 10 <= leftX + 48) {
+                    if (y + 16 >= leftY - 10 && y - 16 <= leftY + 10) {
                         ((Brick) p).destroy();
+                        BombermanGame.map[x/32][y/32] = 1;
                     }
                 }
             }
             for (Enemy p : ballooms) {
-                if (p.getX() - 10 <= left.getX() +16 && p.getX() + 10 >= left.getX() - 16) {
-                    if (p.getY() + 16 >= left.getY() - 10 && p.getY() - 16 <= left.getY() + 10) {
+                double x = p.getX();
+                double y = p.getY();
+                if (x - 10 <= leftX +16 && x + 10 >= leftX - 16) {
+                    if (y + 16 >= leftY - 10 && y - 16 <= leftY + 10) {
                          p.setKilled();
                     }
                 }
             }
             for (Enemy p :oneAls) {
-                if (p.getX() - 10 <= left.getX() +16 && p.getX() + 10 >= left.getX() - 16) {
-                    if (p.getY() + 16 >= left.getY() - 10 && p.getY() - 16 <= left.getY() + 10) {
+                double x = p.getX();
+                double y = p.getY();
+                if (x - 16 <= leftX +16 && x + 16 >= leftX - 16) {
+                    if (y + 16 >= leftY - 10 && y - 16 <= leftY + 10) {
                         p.setKilled();
+                    }
+                }
+            }
+            if(((Portal) BombermanGame.portal).covered() == false) {
+                int x = BombermanGame.portal.getX();
+                int y = BombermanGame.portal.getY();
+                if (x - 15 <= leftX +16 && x + 15 >= leftX - 16) {
+                    if (y + 15 >= leftY - 10 && y - 15 <= leftY + 10) {
+                        ((Portal) BombermanGame.portal).exploded = true;
                     }
                 }
             }
@@ -139,6 +176,8 @@ public class Bomb  extends Entity{
     public void expRight() {
         for(int i = 1; i <= radius; i++) {
             Entity right = new tmpObject(x/Sprite.SCALED_SIZE+i, y/Sprite.SCALED_SIZE, Sprite.explosion_horizontal.getFxImage());
+            int rightX = right.getX();
+            int rightY = right.getY();
             if(validBlock(x+32,y)) {
                 if(validBlock(x+32*i,y)) {
                     explodes.add(right);
@@ -146,39 +185,60 @@ public class Bomb  extends Entity{
             }
             else {
                 for (Entity p : bricks) {
-                    if (p.getX() - 10 >= right.getX() - 16 && p.getX() + 10 <= right.getX() + 36) {
-                        if (p.getY() + 16 >= right.getY() - 10 && p.getY() - 16 <= right.getY() + 10) {
+                    int x = p.getX();
+                    int y = p.getY();
+                    if (x - 10 >= rightX - 16 && x + 10 <= rightX + 36) {
+                        if (y + 16 >= rightY - 10 && y - 16 <= rightY + 10) {
                             ((Brick) p).destroy();
+                            BombermanGame.map[x/32][y/32] = 1;
                         }
                     }
                 }
                 return;
             }
                 for (Entity p : entities) {
-                    if (p.getX() - 10 <= right.getX() + 16 && p.getX() + 10 >= right.getX() - 16) {
-                        if (p.getY() + 16 >= right.getY() - 10 && p.getY() - 16 <= right.getY() + 10) {
+                    int x = p.getX();
+                    int y =p.getY();
+                    if (x - 10 <= rightX + 16 && x + 10 >= rightX - 16) {
+                        if (y + 16 >= rightY - 10 && y - 16 <= rightY + 10) {
                             ((Bomber) p).setKilled();
                         }
                     }
                 }
             for (Entity p : bricks) {
-                if (p.getX() - 10 >= right.getX() - 16 && p.getX() + 10 <= right.getX() + 36) {
-                    if (p.getY() + 16 >= right.getY() - 10 && p.getY() - 16 <= right.getY() + 10) {
+                int x = p.getX();
+                int y =p.getY();
+                if (x - 10 >= rightX - 16 && x + 10 <= rightX + 36) {
+                    if (y + 16 >= rightY - 10 && y - 16 <= rightY + 10) {
                         ((Brick) p).destroy();
+                        BombermanGame.map[x][y] = 1;
                     }
                 }
             }
             for (Enemy p : ballooms) {
-                if (p.getX() - 10 <= right.getX() + 16 && p.getX() + 10 >= right.getX() - 16) {
-                    if (p.getY() + 16 >= right.getY() - 10 && p.getY() - 16 <= right.getY() + 10) {
+               double x = p.getX();
+               double y = p.getY();
+                if (x - 10 <= rightX + 16 && x + 10 >= rightX - 16) {
+                    if (y + 16 >= rightY - 10 && y - 16 <= rightY + 10) {
                         p.setKilled();
                     }
                 }
             }
             for (Enemy p : oneAls) {
-                if (p.getX() - 10 <= right.getX() + 16 && p.getX() + 10 >= right.getX() - 16) {
-                    if (p.getY() + 16 >= right.getY() - 10 && p.getY() - 16 <= right.getY() + 10) {
+                double x = p.getX();
+                double y = p.getY();
+                if (x - 16 <= rightX + 16 && x + 16 >= rightX - 16) {
+                    if (y + 16 >= rightY - 10 && y - 16 <= rightY + 10) {
                         p.setKilled();
+                    }
+                }
+            }
+            if(((Portal) BombermanGame.portal).covered() == false) {
+                int x = BombermanGame.portal.getX();
+                int y = BombermanGame.portal.getY();
+                if (x - 15 <= rightX + 16 && x + 15 >= rightX - 16) {
+                    if (y + 15 >= rightY - 10 && y - 15 <= rightY + 10) {
+                        ((Portal) BombermanGame.portal).exploded = true;
                     }
                 }
             }
@@ -187,6 +247,8 @@ public class Bomb  extends Entity{
     public void expUp() {
         for(int i = 1; i <= radius; i++) {
             Entity top = new tmpObject(x/Sprite.SCALED_SIZE, y/Sprite.SCALED_SIZE-i, Sprite.explosion_vertical.getFxImage());
+            int topX = top.getX();
+            int topY =top.getY();
             if(validBlock(x,y-32)) {
                 if(validBlock(x,y-32*i)) {
                     explodes.add(top);
@@ -194,39 +256,60 @@ public class Bomb  extends Entity{
             }
             else {
                 for (Entity p : bricks) {
-                    if (p.getX() + 10 >= top.getX() - 10 && p.getX() - 10 <= top.getX() + 10) {
-                        if (p.getY() + 16 >= top.getY() - 10 && p.getY() - 17 <= top.getY() + 10) {
+                    int x = p.getX();
+                    int y = p.getY();
+                    if (x + 10 >= topX - 10 && x - 10 <= topX + 10) {
+                        if (y + 16 >= topY - 10 && y - 17 <= topY + 10) {
                             ((Brick) p).destroy();
+                            BombermanGame.map[x/32][y/32] = 1;
                         }
                     }
                 }
                 return;
             }
                 for (Entity p : entities) {
-                    if (p.getX() + 10 >= top.getX() - 10 && p.getX() - 10 <= top.getX() + 10) {
-                        if (p.getY() + 16 >= top.getY() - 10 && p.getY() - 17 <= top.getY() + 10) {
+                    int x = p.getX();
+                    int y = p.getY();
+                    if (x + 10 >= topX - 10 && x - 10 <= topX + 10) {
+                        if (y + 16 >= topY - 15 && y - 17 <= topY + 15) {
                             ((Bomber) p).setKilled();
                         }
                     }
                 }
             for (Entity p : bricks) {
-                if (p.getX() + 10 >= top.getX() - 10 && p.getX() - 10 <= top.getX() + 10) {
-                    if (p.getY() + 16 >= top.getY() - 10 && p.getY() - 17 <= top.getY() + 10) {
+                int x = p.getX();
+                int y = p.getY();
+                if (x + 10 >= topX - 10 && x - 10 <= topX + 10) {
+                    if (y + 16 >= topY - 10 && y - 17 <= topY + 10) {
                         ((Brick) p).destroy();
+                        BombermanGame.map[x/32][y/32] = 1;
                     }
                 }
             }
             for (Enemy p : ballooms) {
-                if (p.getX() + 16 >= top.getX() - 10 && p.getX() - 16 <= top.getX() + 10) {
-                    if (p.getY() + 16 >= top.getY() - 10 && p.getY() - 16 <= top.getY() + 10) {
+                double x = p.getX();
+                double y = p.getY();
+                if (x + 16 >= topX - 10 && x - 16 <= topX + 10) {
+                    if (y + 16 >= topY - 15 && y - 16 <= topY + 15) {
                         p.setKilled();
                     }
                 }
             }
             for (Enemy p : oneAls) {
-                if (p.getX() + 16 >= top.getX() - 10 && p.getX() - 16 <= top.getX() + 10) {
-                    if (p.getY() + 16 >= top.getY() - 10 && p.getY() - 16 <= top.getY() + 10) {
+                double x = p.getX();
+                double y = p.getY();
+                if (x + 16 >= topX - 10 && x - 16 <= topX + 10) {
+                    if (y + 16 >= topY - 15 && y - 16 <= topY + 15) {
                         p.setKilled();
+                    }
+                }
+            }
+            if(((Portal) BombermanGame.portal).covered() == false) {
+                int x = BombermanGame.portal.getX();
+                int y = BombermanGame.portal.getY();
+                if (x + 15 >= topX - 10 && x - 15 <= topX + 10) {
+                    if (y + 15 >= topY - 15 && y - 15 <= topY + 15) {
+                        ((Portal) BombermanGame.portal).exploded = true;
                     }
                 }
             }
@@ -235,6 +318,8 @@ public class Bomb  extends Entity{
     public void expDown() {
         for(int i = 1; i <= radius; i++) {
             Entity bot = new tmpObject(x/Sprite.SCALED_SIZE, y/Sprite.SCALED_SIZE +i, Sprite.explosion_vertical.getFxImage());
+            int botX = bot.getX();
+            int botY = bot.getY();
             if(validBlock(x, y+32)) {
                 if(validBlock(x, y+32*i)) {
                     explodes.add(bot);
@@ -242,39 +327,61 @@ public class Bomb  extends Entity{
             }
             else {
                 for (Entity p : bricks) {
-                    if (p.getX() + 10 >= bot.getX() - 10 && p.getX() - 10 <= bot.getX() + 10) {
-                        if (p.getY() + 16 >= bot.getY() - 10 && p.getY() - 18 <= bot.getY() + 10) {
+                    int x = p.getX();
+                    int y = p.getY();
+                    if (x + 10 >= botX - 10 && x - 10 <= botX + 10) {
+                        if (y + 16 >= botY - 10 && y - 18 <= botY + 10) {
                             ((Brick) p).destroy();
+                            BombermanGame.map[x/32][y/32] = 1;
                         }
                     }
                 }
                 return;
             }
                 for (Entity p : entities) {
-                    if (p.getX() + 10 >= bot.getX() - 10 && p.getX() - 10 <= bot.getX() + 10) {
-                        if (p.getY() + 16 >= bot.getY() - 10 && p.getY() - 18 <= bot.getY() + 10) {
+                    int x = p.getX();
+                    int y = p.getY();
+                    if (x + 10 >= botX - 10 && x - 10 <= botX + 10) {
+                        if (y + 16 >= botY - 15 && y - 18 <= botY + 15) {
                             ((Bomber) p).setKilled();
                         }
                     }
                 }
             for (Entity p : bricks) {
-                if (p.getX() + 10 >= bot.getX() - 10 && p.getX() - 10 <= bot.getX() + 10) {
-                    if (p.getY() + 16 >= bot.getY() - 10 && p.getY() - 18 <= bot.getY() + 10) {
+                int x = p.getX();
+                int y = p.getY();
+                if (x + 10 >= botX - 10 && x - 10 <= botX + 10) {
+                    if (y + 16 >= botY - 10 && y - 18 <= botY + 10) {
                         ((Brick) p).destroy();
+                        BombermanGame.map[x/32][y/32] = 1;
                     }
                 }
             }
                 for (Enemy p : ballooms) {
-                    if (p.getX() + 16 >= bot.getX() - 10 && p.getX() - 16 <= bot.getX() + 10) {
-                        if (p.getY() + 16 >= bot.getY() - 10 && p.getY() - 16 <= bot.getY() + 10) {
+                    double x = p.getX();
+                    double y = p.getY();
+                    if (x + 16 >= botX - 10 && x - 16 <= botX + 10) {
+                        if (y + 16 >= botY - 15 && y - 16 <= botY + 15) {
                             p.setKilled();
                         }
                     }
                 }
             for (Enemy p : oneAls) {
-                if (p.getX() + 16 >= bot.getX() - 10 && p.getX() - 16 <= bot.getX() + 10) {
-                    if (p.getY() + 16 >= bot.getY() - 10 && p.getY() - 16 <= bot.getY() + 10) {
+                double x = p.getX();
+                double y = p.getY();
+                if (x + 16 >= botX - 10 && x - 16 <= botX + 10) {
+                    if (y + 16 >= botY - 15 && y - 16 <= botY + 15) {
                         p.setKilled();
+                    }
+                }
+            }
+            if(((Portal) BombermanGame.portal).covered() == false) {
+                int x = BombermanGame.portal.getX();
+                int y = BombermanGame.portal.getY();
+                if (x + 15 >= botX - 10 && x - 15 <= botX + 10) {
+                    if (y + 15 >= botY - 15 && y - 15 <= botY + 15) {
+                        ((Portal) BombermanGame.portal).exploded = true;
+                        System.out.println("no cong");
                     }
                 }
             }

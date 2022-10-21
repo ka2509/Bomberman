@@ -4,9 +4,8 @@ import javafx.scene.image.Image;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.graphics.Sprite;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+
 
 public class Balloom extends Enemy{
     public Balloom(int xUnit, int yUnit, Image img,
