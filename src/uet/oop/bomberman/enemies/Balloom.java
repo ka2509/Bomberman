@@ -18,7 +18,7 @@ public class Balloom extends Enemy{
         speed = 0.5;
         choseDir(speed);
     }
-    public void balloomMoving() {
+    private void balloomMoving() {
         switch (dir) {
             case 0: img = Sprite.movingSprite(Sprite.balloom_right1, Sprite.balloom_right2, Sprite.balloom_right3, animated++, 50).getFxImage();
                 if(!imPassable(x+speed, y)) {

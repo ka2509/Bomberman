@@ -36,18 +36,19 @@ public class BombermanGame extends Application {
     private List<Entity> buffs = new ArrayList<>();
     public static List<Enemy> ballooms = new ArrayList<>();
     public static List<Enemy> oneAls = new ArrayList<>();
-    public static List<Entity> timer = new ArrayList<>();
+    private static List<Entity> timer = new ArrayList<>();
     public static Entity portal = new Portal();
     public static void main(String[] args) {
         Application.launch(BombermanGame.class);
     }
+    private int play1timewinsound = 1;
+    private int test = 1;
+    private int soundWalk = 0;
+    private boolean stopMenuMusic = false;
     public static boolean isDone = false;
     public static boolean isWin = false;
     private boolean pauseStatus = false;
    public static boolean replay = false;
-    public int play1timewinsound = 1;
-   public int test = 1;
-   public int soundWalk = 0;
     @Override
     public void start(Stage stage) {
         // Tao Canvas
@@ -67,40 +68,44 @@ public class BombermanGame extends Application {
         // Them scene vao stage
         stage.setScene(scene);
         stage.show();
-        if(GameMedia.getMainMenuSound() == null) {
-            GameMedia.setMainMenuSound();
-            GameMedia.getMainMenuSound().play();
-        } else {
-            if(GameMedia.getMainMenuSound().getCurrentTime().equals(GameMedia.getMainMenuSound().getStopTime())) {
-                GameMedia.setMainMenuSoundToNull();
-            }
-        }
+
         menu.render(gc);
         GameMedia.setRestartSound();
         GameMedia.setWinSound();
-            scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
-                @Override
-                public void handle(KeyEvent event) {
-                    switch (event.getCode()) {
-                        case ENTER:
-                            GameMedia.getMainMenuSound().stop();
-                            handleGamePlay(scene,stage);
-                            break;
-                        case ESCAPE:
-                            stage.close();
+        AnimationTimer timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                if(stopMenuMusic) {
+                    this.stop();
+                }
+                if(GameMedia.getMainMenuSound() == null) {
+                    GameMedia.setMainMenuSound();
+                    GameMedia.getMainMenuSound().play();
+                } else {
+                    if(GameMedia.getMainMenuSound().getCurrentTime().equals(GameMedia.getMainMenuSound().getStopTime())) {
+                        GameMedia.setMainMenuSoundToNull();
                     }
                 }
-            });
+                scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                    @Override
+                    public void handle(KeyEvent event) {
+                        switch (event.getCode()) {
+                            case ENTER:
+                                GameMedia.getMainMenuSound().stop();
+                                handleGamePlay(scene,stage);
+                                stopMenuMusic = true;
+                                break;
+                            case ESCAPE:
+                                stage.close();
+                        }
+                    }
+                });
+            }
+        };
+        timer.start();
+
     }
     public void handleGamePlay(Scene scene, Stage stage) {
-        if(GameMedia.getThemeSound() == null) {
-            GameMedia.setThemeSound();
-            GameMedia.getThemeSound().play();
-        } else {
-            if(GameMedia.getThemeSound().getCurrentTime().equals(GameMedia.getThemeSound().getStopTime())) {
-                GameMedia.setThemeSoundToNull();
-            }
-        }
         Entity bomberman = new Bomber(1, 1, Sprite.player_right.getFxImage(),
                     entities, walls, bomb,
                     explodes, bricks, buffs,
@@ -115,6 +120,14 @@ public class BombermanGame extends Application {
             AnimationTimer timer1 = new AnimationTimer() {
                 @Override
                 public void handle(long l) {
+                    if(GameMedia.getThemeSound() == null) {
+                        GameMedia.setThemeSound();
+                        GameMedia.getThemeSound().play();
+                    } else {
+                        if(GameMedia.getThemeSound().getCurrentTime().equals(GameMedia.getThemeSound().getStopTime())) {
+                            GameMedia.setThemeSoundToNull();
+                        }
+                    }
                     if(replay) {
                         this.stop();
                     }
@@ -181,6 +194,14 @@ public class BombermanGame extends Application {
             AnimationTimer timer2 = new AnimationTimer() {
                 @Override
                 public void handle(long now) {
+                    if(GameMedia.getThemeSound() == null) {
+                        GameMedia.setThemeSound();
+                        GameMedia.getThemeSound().play();
+                    } else {
+                        if(GameMedia.getThemeSound().getCurrentTime().equals(GameMedia.getThemeSound().getStopTime())) {
+                            GameMedia.setThemeSoundToNull();
+                        }
+                    }
                     if(replay) {
                         if(test > 0) {
                             createMap();
@@ -329,8 +350,6 @@ public class BombermanGame extends Application {
                             break;
                         case B:
                                 ((Bomber) bomberman).placeBomb();
-                                GameMedia.setPlaceBombSound();
-                                GameMedia.getPlaceBombSound().play();
                             break;
                         case P:
                             pauseStatus = true;
@@ -342,8 +361,8 @@ public class BombermanGame extends Application {
                                 pauseStatus = false;
                             }
                             break;
-//                        case ESCAPE:
-//                            stage.close();
+                        case ESCAPE:
+                            stage.close();
                     }
                 }
             }

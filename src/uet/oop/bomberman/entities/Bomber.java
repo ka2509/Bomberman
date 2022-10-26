@@ -168,13 +168,13 @@ public class Bomber extends Entity {
        }
 
    }
-   void setKilled() {
+   public void setKilled() {
         isAlive = false;
    }
    public boolean isAlive() {
         return isAlive;
    }
-public void checkBuff() {
+private void checkBuff() {
     List<Entity> buffed = new ArrayList<>();
         for(int i = 0; i < buffs.size(); i++) {
          Entity p = buffs.get(i);

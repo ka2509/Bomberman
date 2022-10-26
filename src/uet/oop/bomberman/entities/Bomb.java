@@ -46,6 +46,8 @@ public class Bomb  extends Entity{
     public void setBomb(Entity bomb) {
         if(validPlace(bomb.getX(),bomb.getY())) {
             setBomb = true;
+            GameMedia.setPlaceBombSound();
+            GameMedia.getPlaceBombSound().play();
             bombs.add(bomb);
         }
     }

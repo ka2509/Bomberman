@@ -36,27 +36,36 @@ public void resetB() {
     @Override
     public void update() {
             count++;
-        if(count == 120) {
+            if(count == 120) {
             timer.get(2).img = Sprite.numbersArray[number].getFxImage();
             if(number == 9) {
                 timer.get(1).img = Sprite.numbersArray[number1].getFxImage();
                 if(number1 == 9) {
                     timer.get(0).img = Sprite.numbersArray[number3].getFxImage();
-                    number3--;
+                        number3--;
                 }
                 number1--;
             }
             count = 0;
             number--;
-            if(number == 0 && number1 == 0 && number3 == 0) {
-                BombermanGame.isDone = true;
-            }
-            if(number < 0) {
-                number = 9;
-            }
-            if(number1 < 0) {
-                number1 = 9;
-            }
+//            if(number == 0 && number1 == 0 && number3 == 0) {
+//                BombermanGame.isDone = true;
+//            }
+//            if(number < 0) {
+//                number = 9;
+//            }
+//            if(number1 < 0) {
+//                number1 = 9;
+//            }
+        }
+        if(number < 0 && number1 < 0 && number3 < 0) {
+            BombermanGame.isDone = true;
+        }
+        if(number1 >=0 && number < 0) {
+            number = 9;
+        }
+        if(number3 >=0 && number1 < 0) {
+            number1 = 9;
         }
     }
 }

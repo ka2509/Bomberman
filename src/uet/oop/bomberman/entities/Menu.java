@@ -7,6 +7,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
 public class Menu {
+    public int check1 = 0;
+    public int check2 = 0;
     private Image img;
     private String menuFileName = new File("res/textures/Bomberman_Game.png").toURI().toString();
     private String pauseFileName = new File("res/textures/Pause.png").toURI().toString();

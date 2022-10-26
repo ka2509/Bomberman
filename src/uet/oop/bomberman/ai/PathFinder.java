@@ -13,9 +13,9 @@ public class PathFinder {
         int step = 0;
 
         public PathFinder() {
-            instantiateNodes();
+            initNodes();
         }
-        public void instantiateNodes() {
+        public void initNodes() {
             node = new Node[BombermanGame.WIDTH][BombermanGame.HEIGHT];
             int col =0;
             int row =0;
